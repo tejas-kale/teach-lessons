@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 2 · The Dial You Already Have</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<link rel="stylesheet" href="../assets/quiz.css">
+</head>
+<body>
+<main class="page">
+
+<header class="masthead">
+  <p class="eyebrow">Lesson 2 of 14 · Self-Improving AI Agents</p>
+  <h1>The dial you already have</h1>
+  <p class="standfirst">Repeated sampling turns a weaker model into a stronger one — predictably, with its own scaling law. Two ways to spend inference compute, and which one to reach for.</p>
+  <p class="meta">≈10 minutes · Lecture 2 · Unlocks: "should I upgrade the model or the harness?"</p>
+</header>
+
+<p>Here is the result that reorganised the field. Take Llama 3 8B — a small, open, unimpressive model. Ask it the same hard problem 250 times instead of once. Then, using a verifier, pick the correct answer out of the pile. On several math and coding benchmarks that arrangement beats a single call to a much larger frontier model.<a href="#s1">¹</a></p>
+
+<p>Nothing about the small model changed. No fine-tuning, no better prompt. The correct answer was already inside its output distribution; the default of sampling once threw it away.</p>
+
+<div class="callout">
+  <span class="label">Reframe</span>
+  <p>Stop thinking of a model as a function that returns an answer. Think of it as a <strong>distribution you can draw from</strong>, and of your harness as the thing that decides how many draws to take and which to keep. Model quality sets the distribution. <em>You</em> set everything else.</p>
+</div>
+
+<h2>Coverage has a scaling law</h2>
+
+<p>Define <em class="term">coverage</em> — usually written pass@k — as the fraction of problems solved by <em>at least one</em> of k samples. The Large Language Monkeys work found that coverage grows with k as an approximate power law, and that the fit holds across model families and across three orders of magnitude of parameter count, from 70M to 70B.<a href="#s1">¹</a> On SWE-bench, DeepSeek-V3 with a thousand samples solved more issues than single-shot calls to the frontier models of the day.</p>
+
+<p class="sidenote">Why a power law, when the per-problem maths is exponential? For a single problem with per-sample success probability <em>p</em>, pass@k is 1−(1−p)<sup>k</sup> — clean exponential saturation. Aggregating across a benchmark only produces a power law if the distribution of <em>p</em> across problems has a <strong>long tail of very hard items</strong>. It does, empirically. That tail is the reason sampling keeps paying off long after you'd expect it to stop.</p>
+
+<p>Two things follow that matter to you more than the curve itself:</p>
+
+<ul>
+  <li><strong>You can budget in advance.</strong> Fit the curve on a slice of your own workload and you can answer "how many samples to reach 90%?" with a number rather than a shrug. This is the same discipline as a pre-training scaling law, applied to a dial you actually control.</li>
+  <li><strong>The gains come from the tail.</strong> Easy problems are solved on the first try; extra samples buy you nothing there. All of the value is concentrated in the hard items, which is precisely where per-sample cost is highest. Sampling uniformly across your workload wastes most of the money.</li>
+</ul>
+
+<h2>Parallel or sequential — two ways to spend</h2>
+
+<p>Repeated sampling is only one shape. The other is <em class="term">sequential revision</em>: let the model draft, look again, and improve its own answer over several turns. Snell et al. studied both and, importantly, studied when each wins.<a href="#s2">²</a></p>
+
+<figure>
+<svg viewBox="0 0 660 250" role="img" aria-label="Comparison of parallel sampling, which draws many independent samples and selects one, against sequential revision, which iterates on a single draft.">
+  <text x="20" y="24" class="dg-label-b">PARALLEL — independent draws, then select</text>
+  <rect x="20" y="38" width="70" height="30" rx="3" class="dg-box"/>
+  <text x="55" y="58" class="dg-label" text-anchor="middle">prompt</text>
+  <g class="dg-box">
+    <rect x="150" y="34" width="58" height="20" rx="2"/>
+    <rect x="150" y="60" width="58" height="20" rx="2"/>
+    <rect x="150" y="86" width="58" height="20" rx="2"/>
+  </g>
+  <text x="179" y="48" class="dg-label" text-anchor="middle">draw 1</text>
+  <text x="179" y="74" class="dg-label" text-anchor="middle">draw 2</text>
+  <text x="179" y="100" class="dg-label" text-anchor="middle">draw k</text>
+  <g class="dg-rule" stroke-width="1.2">
+    <path d="M 90 53 C 120 53 120 44 148 44" fill="none"/>
+    <path d="M 90 53 C 120 53 120 70 148 70" fill="none"/>
+    <path d="M 90 53 C 120 53 120 96 148 96" fill="none"/>
+    <path d="M 208 44 C 240 44 240 70 268 70" fill="none"/>
+    <path d="M 208 70 L 268 70" fill="none"/>
+    <path d="M 208 96 C 240 96 240 70 268 70" fill="none"/>
+  </g>
+  <rect x="270" y="54" width="86" height="32" rx="3" class="dg-box"/>
+  <text x="313" y="74" class="dg-label-b" text-anchor="middle">SELECT</text>
+  <text x="400" y="66" class="dg-label" text-anchor="start">latency ≈ one call</text>
+  <text x="400" y="82" class="dg-label" text-anchor="start">needs a good selector</text>
+  <text x="400" y="98" class="dg-label" text-anchor="start">explores diverse approaches</text>
+
+  <line x1="20" y1="132" x2="640" y2="132" class="dg-rule" stroke-width="1"/>
+
+  <text x="20" y="162" class="dg-label-b">SEQUENTIAL — one thread, revised</text>
+  <rect x="20" y="176" width="70" height="30" rx="3" class="dg-box"/>
+  <text x="55" y="196" class="dg-label" text-anchor="middle">prompt</text>
+  <g class="dg-box">
+    <rect x="120" y="176" width="62" height="30" rx="2"/>
+    <rect x="212" y="176" width="62" height="30" rx="2"/>
+    <rect x="304" y="176" width="62" height="30" rx="2"/>
+  </g>
+  <text x="151" y="196" class="dg-label" text-anchor="middle">draft</text>
+  <text x="243" y="196" class="dg-label" text-anchor="middle">revise</text>
+  <text x="335" y="196" class="dg-label" text-anchor="middle">revise</text>
+  <g class="dg-rule" stroke-width="1.2">
+    <line x1="90" y1="191" x2="116" y2="191"/>
+    <line x1="182" y1="191" x2="208" y2="191"/>
+    <line x1="274" y1="191" x2="300" y2="191"/>
+  </g>
+  <text x="400" y="184" class="dg-label" text-anchor="start">latency ≈ k calls</text>
+  <text x="400" y="200" class="dg-label" text-anchor="start">needs per-step feedback</text>
+  <text x="400" y="216" class="dg-label" text-anchor="start">refines one approach</text>
+</svg>
+<figcaption>The trade is exploration against refinement. Parallel draws are independent, so they explore different <em>approaches</em> and parallelise perfectly — the wall-clock cost of 50 samples is close to the cost of one. Sequential revision keeps one approach and polishes it, which is cheaper in tokens but serial in time, and only works if each revision sees real feedback.</figcaption>
+</figure>
+
+<h3>Which to reach for</h3>
+<p>Snell et al.'s rule of thumb, binned by problem difficulty: <strong>easier problems favour sequential revision</strong>, because a roughly-right draft is close to a correct one and needs polishing rather than replacing. <strong>Harder problems favour more parallel exploration</strong>, because the first approach is likely to be the wrong approach entirely, and no amount of revising a wrong plan produces a right one.<a href="#s2">²</a> The optimal mix at the very hardest end is genuinely unresolved — treat anyone who states it confidently with suspicion.</p>
+
+<p class="sidenote">"Difficulty" here is operationalised the only way that is actually available to you: measure pass@1 on a sample of your own tasks and bin by it. You do not need a theory of difficulty; you need a histogram. This is the cheapest useful measurement in the whole course, and Lesson 12 builds on it.</p>
+
+<div class="quiz" data-answer="a">
+  <span class="label">Check yourself</span>
+  <p class="q">Your agent writes an analysis that is structurally right but keeps making small errors in the final numbers. Where should the extra inference budget go?</p>
+  <div class="opts">
+    <button class="opt">Sequential revision, since the chosen approach is sound and only needs correcting.</button>
+    <button class="opt">Parallel sampling, since drawing more attempts raises the coverage of correct answers.</button>
+    <button class="opt">A larger frontier model, since small numerical errors indicate weak model capability.</button>
+    <button class="opt">A longer system prompt, since the errors show the instructions are underspecified.</button>
+  </div>
+  <div class="answer-reveal">
+    <p>Structurally right, locally wrong is the signature of an easy-to-medium problem in the difficulty binning — the draft is near the answer. Revision (ideally with a tool that can actually check the arithmetic, see Lesson 7) is the efficient spend. Parallel sampling would buy you fifty analyses with fifty different small errors, and no way to tell them apart.</p>
+  </div>
+</div>
+
+<h2>The honest limit: where a bigger model still wins</h2>
+
+<p>Test-time compute is not a free substitute for capability. Snell et al. compared spending tokens at inference against spending them on pre-training and found the answer flips with difficulty: for <strong>easy and medium</strong> problems, additional inference compute beats a bigger model; for the <strong>hardest</strong> problems, the larger, more heavily pre-trained model still wins even at generous inference budgets.<a href="#s2">²</a> Mirhoseini reports the same pattern from her lab: small open models keep getting more useful as you apply more test-time compute, but the genuinely hard tail still belongs to the frontier.</p>
+
+<p>There is an asymmetry worth naming, though. Pre-training is paid once by someone with a datacentre; inference is paid every time, by you. Most people cannot choose to pre-train. Almost everyone can choose to sample five times — which is why this axis is the practical one even where it is not the theoretically superior one.</p>
+
+<div class="callout">
+  <span class="label">The catch, which is the next two lessons</span>
+  <p>Everything above assumes you can <strong>identify the good sample</strong>. Coverage is what your model could achieve with a perfect verifier. What you actually ship is coverage minus your selection error, and that subtraction is usually brutal. Lesson 3 measures it.</p>
+</div>
+
+<h2>Turn the dial this week</h2>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Dial</th><th>How to turn it</th><th>Costs you</th></tr></thead>
+  <tbody>
+    <tr><td>k, the sample count</td><td>Run the same task 5–10× at temperature ≈ 0.7–1.0; measure how often <em>any</em> run succeeds</td><td>Tokens, linearly. Parallelisable, so barely any latency.</td></tr>
+    <tr><td>Revision turns</td><td>Add an explicit "check your work against X, then produce a final answer" pass</td><td>Latency, serially. Nearly worthless without real feedback in X.</td></tr>
+    <tr><td>Thinking budget</td><td>Raise the reasoning-effort / thinking-tokens setting on a reasoning model</td><td>The laziest version of this lesson, and often the best first try.</td></tr>
+    <tr><td>Difficulty routing</td><td>Cheap single call first; escalate to sampling only when a check fails</td><td>Engineering. Usually the biggest cost saving available.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The measurement that makes all of this real: for one workflow you own, run each task 10 times and record how often at least one run succeeded versus how often the <em>first</em> run succeeded. The gap between those two numbers is your available headroom, and it is almost always larger than people expect.</p>
+
+<div class="recall">
+  <span class="label">Retrieval practice</span>
+  <p class="prompt">From memory: why does coverage across a benchmark follow a power law when the per-problem maths is exponential — and what does that fact tell you about where your sampling budget is going?</p>
+  <textarea placeholder="Answer before revealing."></textarea>
+  <div class="model-answer">
+    <p>Per problem, pass@k = 1−(1−p)<sup>k</sup>, which saturates fast. A power law over the whole benchmark only emerges if p is distributed with a long tail toward zero — many easy items, and a heavy tail of very hard ones. Practically: the first sample resolves the easy mass, and every sample after that is being spent almost entirely on the hard tail. That is an argument for <em>routing</em> — detect the hard cases and spend there — rather than raising k uniformly.</p>
+  </div>
+</div>
+
+<h2>What you can now do</h2>
+<p>You can state the difference between parallel and sequential test-time compute, pick between them from the shape of your failures, and give a number for the headroom sampling would buy on your own workload. You also know the limit: this dial does not manufacture capability the model lacks, and on the hardest tail a better model still wins.</p>
+<p>Next: <a href="0003-coverage-is-not-accuracy.html">Lesson 3 — coverage is not accuracy</a>, which is where the headroom you just measured meets the reason most people never collect it.</p>
+
+<div class="ask">
+  <strong>Bring a workload.</strong> If you tell your teacher what one of your agent tasks looks like, we can work out together what k is worth trying, whether revision or sampling fits the failure shape, and what the cheapest possible verifier would be.
+</div>
+
+<div class="source-box">
+  <span class="label">Read one thing</span>
+  <ol>
+    <li id="s1"><strong>Start here:</strong> <a href="https://arxiv.org/abs/2407.21787">Brown et al., <em>Large Language Monkeys: Scaling Inference Compute with Repeated Sampling</em></a>. Read §3 and the coverage figures. It is short, empirical, and it is the paper the rest of this arc argues with.</li>
+    <li id="s2"><a href="https://arxiv.org/abs/2408.03314">Snell et al., <em>Scaling LLM Test-Time Compute Optimally Can Be More Effective Than Scaling Model Parameters</em></a> — the difficulty-binned sequential-vs-parallel results.</li>
+    <li id="s3"><a href="https://www.youtube.com/watch?v=-Ggc37xLj_Y">CS329A Lecture 2 — Test-Time Compute Scaling</a> (Mirhoseini). Source for this lesson, including the KernelBench and SWE-bench results.</li>
+  </ol>
+</div>
+
+<nav class="lesson-nav">
+  <span><a href="0001-where-the-returns-moved.html">← Lesson 1</a></span>
+  <span><a href="../index.html">Index</a> · <a href="../reference/glossary.html">Glossary</a></span>
+  <span><a href="0003-coverage-is-not-accuracy.html">Lesson 3: Coverage is not accuracy →</a></span>
+</nav>
+
+</main>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

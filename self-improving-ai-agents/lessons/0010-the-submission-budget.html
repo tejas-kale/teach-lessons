@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 10 · The Submission Budget</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<link rel="stylesheet" href="../assets/quiz.css">
+</head>
+<body>
+<main class="page">
+
+<header class="masthead">
+  <p class="eyebrow">Lesson 10 of 14 · Self-Improving AI Agents</p>
+  <h1>The submission budget</h1>
+  <p class="standfirst">You can generate a million candidates. You can only check ten. What happens in between is the entire system — and one year of improvements to it doubled performance without adding a single sample.</p>
+  <p class="meta">≈10 minutes · Lecture 7 · The most complete worked example in the course</p>
+</header>
+
+<p>Every lesson so far has assumed you could evaluate the candidates you generate. Competitive programming breaks that assumption in a way your work also does, and the break is instructive: you may submit only a handful of solutions to the contest platform. Generating is cheap; <strong>checking is rationed</strong>.</p>
+
+<p>That constraint has a metric. Alongside pass@k, AlphaCode<a href="#s1">¹</a> reports <strong>10@k</strong>: generate k candidates, submit 10, how many problems are solved? pass@k measures your <em>search</em>; 10@k measures search <em>and</em> selection together. The gap between them is the generation–verification gap from Lesson 3, now with a hard budget attached — and in the AlphaCode results it is large, roughly 40% against 30%.</p>
+
+<p class="sidenote">You have this constraint more often than you notice. Anything with a rate limit, a per-call cost, a human reviewer, or an irreversible action is rationed checking. If a human approves your agent's output, your submission budget is one, and 10@k with 10 set to 1 is the metric describing your life.</p>
+
+<h2>AlphaCode: a million samples and a funnel</h2>
+
+<p>The pipeline is worth walking through as a template.</p>
+
+<figure>
+<svg viewBox="0 0 660 210" role="img" aria-label="Funnel diagram: one million samples filtered by example tests to tens of thousands, clustered by behaviour, then ten submitted.">
+  <polygon points="24,30 24,180 636,140 636,70" class="dg-box"/>
+
+  <line x1="200" y1="43" x2="200" y2="167" class="dg-rule" stroke-width="1.2"/>
+  <line x1="392" y1="59" x2="392" y2="151" class="dg-rule" stroke-width="1.2"/>
+  <line x1="530" y1="66" x2="530" y2="144" class="dg-rule" stroke-width="1.2"/>
+
+  <text x="112" y="100" class="dg-label-b" text-anchor="middle">1,000,000</text>
+  <text x="112" y="118" class="dg-label" text-anchor="middle">sampled</text>
+  <text x="112" y="196" class="dg-label" text-anchor="middle">high temperature,</text>
+  <text x="112" y="16" class="dg-label" text-anchor="middle">GENERATE</text>
+
+  <text x="296" y="100" class="dg-label-b" text-anchor="middle">~50,000</text>
+  <text x="296" y="118" class="dg-label" text-anchor="middle">survive</text>
+  <text x="296" y="196" class="dg-label" text-anchor="middle">run the example tests</text>
+  <text x="296" y="16" class="dg-label" text-anchor="middle">FILTER</text>
+
+  <text x="461" y="100" class="dg-label-b" text-anchor="middle">10 clusters</text>
+  <text x="461" y="196" class="dg-label" text-anchor="middle">group by behaviour</text>
+  <text x="461" y="16" class="dg-label" text-anchor="middle">CLUSTER</text>
+
+  <text x="583" y="100" class="dg-label-b" text-anchor="middle">10</text>
+  <text x="583" y="118" class="dg-label" text-anchor="middle">submitted</text>
+  <text x="583" y="16" class="dg-label" text-anchor="middle">RANK</text>
+</svg>
+<figcaption>Roughly 95% of samples are removed by simply running the example tests — free, deterministic, and by far the highest-yield step. Clustering then groups <em>semantically equivalent</em> programs: run each candidate on generated test inputs and group by identical output behaviour. Submitting one from each of the ten largest clusters spends the budget on ten genuinely different approaches rather than ten spellings of one.</figcaption>
+</figure>
+
+<p>The clustering trick is the elegant part and it generalises. You cannot tell which candidate is <em>right</em>, but you can cheaply tell which are the <em>same</em>. Deduplicating by behaviour converts a scarce checking budget into maximum coverage of distinct hypotheses. Note the equivalence is behavioural, not textual — two programs written differently that agree on every input are one candidate for these purposes.</p>
+
+<p>Two honest limitations from the paper: training loss is a poor proxy for solve rate, and the whole thing needed sampling at a scale that is impractical for most uses.</p>
+
+<div class="quiz" data-answer="b">
+  <span class="label">Check yourself</span>
+  <p class="q">Your agent produces eight candidate analyses and a human can review two. What is the highest-value step before choosing?</p>
+  <div class="opts">
+    <button class="opt">Rank all eight with a judge model and pass the two highest-scoring ones to the reviewer.</button>
+    <button class="opt">Group them by the conclusion they reach, then send one from each of the two largest groups.</button>
+    <button class="opt">Fuse all eight into a single analysis and use the freed review slot for a second opinion.</button>
+    <button class="opt">Discard any that fail your deterministic checks and rank whatever survives by length.</button>
+  </div>
+  <div class="answer-reveal">
+    <p>If six of the eight reach the same conclusion, ranking them likely sends the reviewer two versions of the same answer — and the whole point of a second slot is to see a genuinely different one. Cluster first, then rank within clusters. C is a strong option and often correct (Lesson 6), but it destroys exactly the disagreement a human reviewer is best placed to adjudicate — so when the scarce resource is human judgement, preserve the diversity rather than averaging it away.</p>
+  </div>
+</div>
+
+<h2>AlphaCode 2: what a year of system-building bought</h2>
+
+<p>The follow-up<a href="#s2">²</a> is the more useful half of this lecture, because it isolates <em>which</em> improvements mattered. Three changes:</p>
+
+<ul>
+  <li><strong>Stop pre-training your own model.</strong> Fine-tune a strong general model (Gemini Pro) instead.</li>
+  <li><strong>Engineer diversity deliberately.</strong> Rather than relying on temperature alone, fine-tune a <em>family</em> of model variants on different data segments and hyperparameters, and split sampling across them.</li>
+  <li><strong>Replace heuristic selection with a learned scoring model</strong> — a fine-tuned reward model that ranks within clusters.</li>
+</ul>
+
+<div class="callout">
+  <span class="label">The number that matters</span>
+  <p>AlphaCode 2 reached AlphaCode's solve rate with about <strong>100 samples instead of a million</strong> — four orders of magnitude less compute. At an equal million-sample budget it roughly doubled the solve rate (about 43% against 25%), landing near the 85th percentile of human contestants. <em>None of that came from sampling harder.</em> It came from a better base model, deliberately diverse candidates, and a learned selector.</p>
+</div>
+
+<p>That is the strategic lesson of the whole course in one comparison. Sampling is the dial you reach for first because it is trivially available (Lesson 2). It is also the one with the worst returns per unit of engineering. The compounding gains live in the parts around it — and each of the three improvements is one you can make.</p>
+
+<h2>What this means for you</h2>
+
+<ul>
+  <li><strong>Filter with free checks before spending expensive ones.</strong> Running example tests removed 95% of candidates at nearly zero cost. Your equivalents — does it parse, does the query run, does the schema match, does the total reconcile — should always run before any model or human is consulted.</li>
+  <li><strong>Deduplicate by behaviour, not by text.</strong> Two analyses reaching the same conclusion by different routes are one candidate. Two reaching different conclusions are the interesting case, and precisely what a scarce reviewer should see.</li>
+  <li><strong>Manufacture diversity rather than hoping for it.</strong> Temperature gives you shallow variation. Different models, different prompt framings, different assumed constraints give you different <em>approaches</em>. The AlphaCode 2 team fine-tuned variants to get this; you get most of it for free by using several model families.</li>
+  <li><strong>Know your real submission budget.</strong> Write down how many candidates you can actually verify per task, and design the funnel to fit it. Most pipelines are implicitly built for a budget of one and never ask whether that was the right number.</li>
+  <li><strong>Track 10@k, not just pass@k.</strong> Or in your case n@k, where n is your true checking capacity. It is the number that describes the system you actually run.</li>
+</ul>
+
+<p class="sidenote">One caution the lecture raises: sampling more only helps if the extra samples are genuinely <em>diverse</em>. Ten times more samples that cluster into the same few behaviours buys nothing. This is why the clustering step is not merely a budget-saving device — it is also the instrument that tells you whether your generation is exploring at all. If your candidate count rises and your cluster count doesn't, stop paying for samples.</p>
+
+<div class="recall">
+  <span class="label">Retrieval practice</span>
+  <p class="prompt">Write out the funnel for one workflow you own: how many candidates could you generate, what free checks remove most of them, how would you cluster the survivors, and how many can you actually verify?</p>
+  <textarea placeholder="The last number is usually smaller than people admit."></textarea>
+  <div class="model-answer">
+    <p>Worked example, an agent proposing data-quality fixes. <em>Generate:</em> 20 proposals across two model families. <em>Free checks:</em> does the SQL parse, does it run against a sandbox, does it change a plausible number of rows — this typically kills half. <em>Cluster:</em> by the set of rows each proposal actually changes, run on a sample; proposals with identical effects are one candidate regardless of how differently they are written. <em>Verify:</em> a human reviews three. The funnel turns 20 proposals into perhaps four distinct behaviours, and the reviewer sees the three most distinct rather than three phrasings of the same fix. Note that the clustering step required a sandbox — Lesson 8's prerequisite, again.</p>
+  </div>
+</div>
+
+<h2>What you can now do</h2>
+<p>You can design a funnel from a large candidate pool down to a rationed checking budget, using free checks first and behavioural clustering to preserve diversity. And you have the AlphaCode 2 comparison as the argument for where to spend engineering effort: base model, diversity, and selection compound; raw sample count does not.</p>
+<p>Next: <a href="0011-deep-research-agents.html">Lesson 11 — deep research agents</a>, the architecture from this same lecture that maps most directly onto analysis work.</p>
+
+<div class="ask">
+  <strong>The clustering step is where designs differ most.</strong> What "the same answer" means is domain-specific and genuinely hard — for code it's output behaviour, for analysis it might be the conclusion or the decision implied. Worth working out on a real case.
+</div>
+
+<div class="source-box">
+  <span class="label">Read one thing</span>
+  <ol>
+    <li id="s1"><a href="https://arxiv.org/abs/2203.07814">Li et al., <em>Competition-Level Code Generation with AlphaCode</em></a> (DeepMind, 2022) — read §4 on filtering and clustering, which is the transferable part.</li>
+    <li id="s2"><strong>Primary source:</strong> <a href="https://www.youtube.com/watch?v=Uni9dqyuuDM">CS329A Lecture 7 — Self-Improvement and Deep Research Agents</a> (Tandon), which presents both AlphaCode papers side by side. The year-over-year comparison is the reason to watch it.</li>
+    <li id="s3"><a href="https://arxiv.org/abs/2407.21787">Brown et al., <em>Large Language Monkeys</em></a> — revisit §4 now: the log-linear solve-rate trend survives the selection stage, which is not obvious and is what makes the funnel worth building.</li>
+  </ol>
+</div>
+
+<nav class="lesson-nav">
+  <span><a href="0009-buy-or-tune.html">← Lesson 9</a></span>
+  <span><a href="../index.html">Index</a> · <a href="../reference/glossary.html">Glossary</a></span>
+  <span><a href="0011-deep-research-agents.html">Lesson 11: Deep research agents →</a></span>
+</nav>
+
+</main>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

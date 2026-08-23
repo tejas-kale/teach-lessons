@@ -1,0 +1,44 @@
+# Status
+
+Progress across the teaching workspaces in this repository. Update this file whenever a lesson is read, a learning record is written, or a new arc starts.
+
+_Last updated: 2026-08-23_
+
+## Summary
+
+| Course | Lessons | Read | Progress |
+|---|---|---|---|
+| [FX & Central Banks](fx-and-central-banks/) | 4 | 2 | ▓▓▓▓▓░░░░░ 50% — in progress |
+| [Self-Improving AI Agents](self-improving-ai-agents/) | 14 | 0 | ░░░░░░░░░░ 0% — not started |
+
+## Foreign Exchange & Central Banks
+
+Built 20 August 2026, four lessons, ≈30 minutes end to end. Spine: *The Economist*, "When Japan buys yen, it unwinds a dangerous trade" (13 Aug 2026).
+
+| # | Lesson | Status |
+|---|---|---|
+| 1 | [The exchange rate is a price](fx-and-central-banks/lessons/0001-the-exchange-rate-is-a-price.html) | ✅ Read |
+| 2 | [Reserves, and what it means to intervene](fx-and-central-banks/lessons/0002-reserves-and-intervention.html) | ✅ Read — Tejas stopped here; two lessons were sufficient for the session |
+| 3 | [Bonds, and the state as one balance sheet](fx-and-central-banks/lessons/0003-bonds-and-the-consolidated-state.html) | ⬜ Not read |
+| 4 | [The carry trade, and why buying yen unwinds it](fx-and-central-banks/lessons/0004-the-carry-trade-decoded.html) | ⬜ Not read |
+
+**Where to pick up:** Lesson 3, *consolidation* — netting the treasury and the central bank into one balance sheet. It is the load-bearing idea of the arc and Lesson 4 depends on it heavily, so resuming means starting there rather than skimming forward.
+
+**Retention:** unmeasured. Quiz and retrieval answers are not visible to the teacher. Before continuing, ask for the Lesson 2 mechanism cold — who actually spends the money in an intervention, and why the asymmetry runs the way it does.
+
+**Learning records:** [0001 — prior knowledge and time budget](fx-and-central-banks/learning-records/0001-prior-knowledge-and-time-budget.md), [0002 — arc one delivered](fx-and-central-banks/learning-records/0002-arc-one-delivered.md)
+
+## Self-Improving AI Agents
+
+Built 21 August 2026 from Stanford CS329A transcripts. Fourteen lessons in four arcs. Whole arc written up front, so it reflects inferred level rather than demonstrated learning.
+
+| Arc | Lessons | Status |
+|---|---|---|
+| I · The map and the dial | 1–3 | ⬜ Not read |
+| II · Verification | 4–7 | ⬜ Not read |
+| III · Getting better over time | 8–11 | ⬜ Not read |
+| IV · Measuring it | 12–14 | ⬜ Not read |
+
+**Where to start:** Lesson 1, then run Lesson 3's two-number test for real. Lesson 1's retrieval question is the intended diagnostic for whether the pacing assumption held.
+
+**Learning records:** [0001 — practitioner, not researcher](self-improving-ai-agents/learning-records/0001-practitioner-not-researcher.md), [0002 — course built from transcripts](self-improving-ai-agents/learning-records/0002-course-built-from-transcripts.md), [0003 — the three bottlenecks](self-improving-ai-agents/learning-records/0003-the-three-bottlenecks.md), [0004 — Part 04 correction](self-improving-ai-agents/learning-records/0004-part-04-correction.md)

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reference · Self-Improving AI Agents Glossary</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<link rel="stylesheet" href="../assets/reference.css">
+</head>
+<body class="reference">
+<main class="page">
+
+<header class="masthead">
+  <p class="eyebrow">Reference · Self-Improving AI Agents</p>
+  <h1>Glossary</h1>
+  <p class="standfirst">The canonical vocabulary for this workspace. Where the literature uses several words for one idea, one is chosen here and the rest listed as aliases to avoid.</p>
+  <p class="meta">Prints to three pages · Keep open while reading papers</p>
+</header>
+
+<h2>Where compute goes</h2>
+<dl class="terms">
+  <div class="term-entry"><dt>Pre-training scaling</dt><dd>Improving a model by adding parameters, data and compute before any task exists. Predictable, expensive, and flattening since around 2024.<span class="avoid">Avoid: scaling laws, unqualified — there are now several</span></dd></div>
+  <div class="term-entry"><dt>Train-time scaling</dt><dd>Post-training compute, mostly reinforcement learning against checkable rewards. Where reasoning models come from. You consume this axis; you rarely control it.<span class="avoid">Avoid: fine-tuning, which is a narrower thing</span></dd></div>
+  <div class="term-entry"><dt>Test-time scaling</dt><dd>Compute spent during the request: longer thinking, repeated sampling, search, verification. Entirely a property of your harness.<span class="avoid">Avoid: inference optimisation — that usually means making inference cheaper, the opposite concern</span></dd></div>
+  <div class="term-entry"><dt>Self-improvement</dt><dd>The loop where test-time compute manufactures verified successes that become supervision. Industrially: synthetic training data. Practically: accumulated verified experience.</dd></div>
+  <div class="term-entry"><dt>Parallel sampling</dt><dd>Drawing k independent candidates from one prompt. Explores different approaches; parallelises, so k samples cost roughly one sample's latency.<span class="avoid">Avoid: batching, which is an infrastructure term</span></dd></div>
+  <div class="term-entry"><dt>Sequential revision</dt><dd>One draft, improved over several turns. Refines a single approach; serial in latency; near-worthless without real feedback between turns.</dd></div>
+</dl>
+
+<h2>Measuring</h2>
+<dl class="terms">
+  <div class="term-entry"><dt>Coverage / pass@k</dt><dd>Fraction of problems solved by <em>at least one</em> of k samples. What your system could achieve with a perfect selector. An upper bound, not a result.<span class="avoid">Avoid: accuracy at k</span></dd></div>
+  <div class="term-entry"><dt>pass@1</dt><dd>Fraction solved on a single attempt. What you ship, unless you have built a selector.</dd></div>
+  <div class="term-entry"><dt>pass^k</dt><dd>Fraction of problems solved on <em>all</em> k independent attempts. A reliability metric: it punishes variance where pass@k rewards it. Almost always the honest number for a production workflow.<span class="avoid">Avoid: confusing with pass@k — the notation is cruel and the meanings are opposite</span></dd></div>
+  <div class="term-entry"><dt>Generation–verification gap</dt><dd>The distance between coverage and what your selector actually delivers. Usually the dominant term in agent underperformance.<span class="avoid">Avoid: generator–verifier gap (same thing, less common)</span></dd></div>
+  <div class="term-entry"><dt>Majority voting / self-consistency</dt><dd>Selecting the modal answer across samples. Suppresses idiosyncratic noise; structurally blind to rare-correct answers, so it plateaus after roughly 10–50 samples.</dd></div>
+  <div class="term-entry"><dt>Best-of-n</dt><dd>Generate n candidates, score each with a verifier or reward model, return the highest. The standard baseline.</dd></div>
+</dl>
+
+<h2>Verification</h2>
+<dl class="terms">
+  <div class="term-entry"><dt>Verifier</dt><dd>Anything that scores an output's correctness. Ranges from a compiler (near-perfect) to a prompted judge (weak). The umbrella term.</dd></div>
+  <div class="term-entry"><dt>Outcome reward model (ORM)</dt><dd>Scores the final answer only. Cheap labels; blind to right-answers-by-wrong-reasoning; overfits its training distribution more than you would like.</dd></div>
+  <div class="term-entry"><dt>Process reward model (PRM)</dt><dd>Scores each intermediate step. Catches false positives, finds rare-correct solutions, generalises further, and can prune search mid-generation. Costs step-level labels and adds a threshold to tune.</dd></div>
+  <div class="term-entry"><dt>Rollout labelling</dt><dd>Scoring a step by how often completions from that point reach a correct final answer. Hard estimate: any success counts. Soft estimate: the success fraction. Removes the need for human step annotation.<span class="avoid">Avoid: Monte Carlo supervision, unless you mean it precisely</span></dd></div>
+  <div class="term-entry"><dt>Weak verifier</dt><dd>A verifier correlated with correctness but reliably imperfect — most LLM judges, most reward models. The realistic case, and the assumption the Weaver line of work is built on.</dd></div>
+  <div class="term-entry"><dt>Verifier ensemble</dt><dd>Several weak verifiers, filtered for quality then combined with learned weights. Requires that their errors be <em>independent</em>, which prompts of the same model are not.</dd></div>
+  <div class="term-entry"><dt>LLM-as-judge</dt><dd>Using a model to score outputs. Known biases: position, verbosity, self-preference, style-over-substance, and poor calibration on numeric scales.<span class="avoid">Avoid: AI evaluator — too vague to design against</span></dd></div>
+  <div class="term-entry"><dt>Public / private check split</dt><dd>Showing an agent some checks to iterate against while scoring on held-out ones. The defence against your agent optimising your assertions instead of the task.</dd></div>
+</dl>
+
+<h2>Architecture</h2>
+<dl class="terms">
+  <div class="term-entry"><dt>Fusion</dt><dd>Handing a model several candidate answers and asking it to synthesise one. Can exceed oracle selection, because it composes partial merits rather than choosing among them.<span class="avoid">Avoid: aggregation, which suggests voting</span></dd></div>
+  <div class="term-entry"><dt>Critic</dt><dd>An operation producing a written critique of a candidate, consumed by a later ranker or fuser. Specific instructions ("list unsupported claims") beat general ones ("critique this").</dd></div>
+  <div class="term-entry"><dt>Ranker</dt><dd>Prompted ordering of candidates by quality. Cheap; better than random; well short of an oracle.</dd></div>
+  <div class="term-entry"><dt>ReAct loop</dt><dd>Interleaved thought → action → observation, with each thought appended to context. The base pattern of nearly every tool-using agent.</dd></div>
+  <div class="term-entry"><dt>Orchestrator / planner–worker</dt><dd>A central model decomposes a task and dispatches sub-tasks. Distinct from chaining, where the decomposition is fixed in advance by you.</dd></div>
+  <div class="term-entry"><dt>Error cascading</dt><dd>One wrong observation or step contaminating everything downstream, with the agent rarely revisiting it. The dominant failure of long-horizon runs.</dd></div>
+  <div class="term-entry"><dt>Constitution</dt><dd>An explicit written set of principles a good output must satisfy. Doubles as a critique prompt and an eval rubric. The fallback when no oracle exists.</dd></div>
+</dl>
+
+<h2>Things people confuse</h2>
+<ul class="rules">
+  <li><strong>Coverage is not accuracy.</strong> pass@k is what the model could do; pass@1 is what you ship. Reporting the first as if it were the second is the most common overstatement in agent demos.</li>
+  <li><strong>pass@k and pass^k are opposites.</strong> One asks "ever succeeds", the other "always succeeds". For anything running unattended, you want the second.</li>
+  <li><strong>A verifier is not an evaluator.</strong> A verifier runs inside the loop to select outputs; an evaluator runs outside it to measure the system. Use the same component for both and your eval is measuring itself.</li>
+  <li><strong>More samples is not always better.</strong> Past some k, a weak verifier starts selecting confident wrong answers. Sweep k and find where your curve turns over.</li>
+  <li><strong>An ensemble of one model is not an ensemble.</strong> Independence of errors is what buys signal, and three prompts of one model share every blind spot.</li>
+  <li><strong>Test-time compute does not manufacture missing capability.</strong> On the hardest tail, a stronger model still wins at any realistic budget.</li>
+</ul>
+
+<nav class="lesson-nav">
+  <span><a href="../index.html">← Course index</a></span>
+  <span><a href="tuning-dials.html">Tuning dials</a> · <a href="eval-playbook.html">Eval playbook</a></span>
+</nav>
+
+</main>
+</body>
+</html>

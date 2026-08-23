@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 12 · Evals That Change Decisions</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<link rel="stylesheet" href="../assets/quiz.css">
+</head>
+<body>
+<main class="page">
+
+<header class="masthead">
+  <p class="eyebrow">Lesson 12 of 14 · Self-Improving AI Agents</p>
+  <h1>Evals that change decisions</h1>
+  <p class="standfirst">Three benchmarks that ask genuinely different questions — how long a task, how good against an expert, how well-sourced — and the reliability gap hiding inside the headline numbers.</p>
+  <p class="meta">≈11 minutes · Lecture 8 · The lesson your third stated goal was about</p>
+</header>
+
+<p>The lecture opens by asking who in the room runs evaluations for their project. Nobody answers. That is the state of practice, and it is why "the agent seems better lately" is the most common performance claim in the field.</p>
+
+<p>The three benchmarks below are worth knowing not as leaderboards but as <strong>three distinct question types</strong>. Each maps onto a decision you might need to make.</p>
+
+<h2>METR: how long a task, and how reliably?</h2>
+
+<p>METR's time-horizon work<a href="#s1">¹</a> anchors difficulty in a unit you already understand: <strong>how long the task takes a skilled human</strong>. Around 170 tasks spanning a second to eight hours, with completion times recorded from professionals with roughly five years' experience. Fit a curve of model success rate against human task duration, and read off the duration at which the model succeeds 50% of the time.</p>
+
+<p>The headline is the doubling: from about two seconds for GPT-2 in 2019, to minutes around GPT-4, to roughly 59 minutes for the frontier models of early 2025 — a doubling time near seven months. That number is quoted everywhere.</p>
+
+<div class="callout">
+  <span class="label">The number that isn't quoted</span>
+  <p>Ask for <strong>80%</strong> reliability instead of 50% and the same models drop to roughly <strong>15 minutes</strong>. A 4× collapse from the same measurements. The 80% curve is also doubling, but it sits far below — so any deployment decision made from the 50% number is being made from a horizon four times longer than the one you would actually experience.</p>
+</div>
+
+<figure>
+<svg viewBox="0 0 640 250" role="img" aria-label="Two rising curves of task duration against model release date: the 50 percent success horizon well above the 80 percent success horizon, with the gap between them labelled the reliability gap.">
+  <line x1="70" y1="200" x2="590" y2="200" class="dg-rule" stroke-width="1.2"/>
+  <line x1="70" y1="200" x2="70" y2="28" class="dg-rule" stroke-width="1.2"/>
+  <text x="330" y="232" class="dg-label" text-anchor="middle">model release date</text>
+  <text x="24" y="114" class="dg-label" text-anchor="middle" transform="rotate(-90 24 114)">task length (log)</text>
+
+  <path d="M 80 188 C 220 170 380 110 560 46" class="dg-stroke" stroke-width="2.2" fill="none"/>
+  <text x="556" y="36" class="dg-label-b" text-anchor="end">50% success — "59 minutes"</text>
+
+  <path d="M 80 196 C 220 188 380 154 560 106" class="dg-stroke" stroke-width="2" fill="none" stroke-dasharray="6 4"/>
+  <text x="556" y="124" class="dg-label-b" text-anchor="end">80% success — "15 minutes"</text>
+
+  <line x1="500" y1="60" x2="500" y2="120" class="dg-rule" stroke-width="1"/>
+  <line x1="494" y1="60" x2="506" y2="60" class="dg-rule" stroke-width="1"/>
+  <line x1="494" y1="120" x2="506" y2="120" class="dg-rule" stroke-width="1"/>
+  <text x="486" y="84" class="dg-label-b" text-anchor="end">the reliability gap</text>
+  <text x="486" y="100" class="dg-label" text-anchor="end">≈4× shorter at 80%</text>
+</svg>
+<figcaption>Both curves double at a similar rate; they are separated by a large multiple. The distinction matters because the two describe different products: a 50% agent is one you supervise, a 80% agent is one you can leave alone for a while. Progress on capability does not automatically deliver progress on reliability, and it is reliability that decides whether something can be deployed.</figcaption>
+</figure>
+
+<p class="sidenote">This is Lesson 3's pass@1-versus-pass^k distinction wearing different clothes, and it is the reason that pairing is in the eval playbook. Whenever you see an agent capability claim, ask what success threshold it was measured at. A demo is a pass@k result presented as a pass^k product.</p>
+
+<h2>GDPval: is the output good enough, against a professional?</h2>
+
+<p>GDPval<a href="#s2">²</a> asks the other question: not <em>how long</em>, but <em>how good</em>. It sources real work from professionals with a decade or more of experience across 44 occupations and nine sectors — brochures, consultation reports, competitive landscapes, audit reconciliations, itineraries — and scores model output by <strong>win rate against the expert's</strong> in blind pairwise comparison. Around 70% of tasks require working with reference files; most are multimodal.</p>
+
+<p>Two findings deserve your attention.</p>
+
+<p><strong>The trend is roughly linear, not exponential.</strong> Win rates went from around 12% in 2024 to the mid-40s for the strongest 2025 models. That is real progress, and it is a very different shape from METR's doubling — a useful corrective to extrapolating "an hour now, so a week by next year". The two benchmarks measure different things and disagree about the trajectory.</p>
+
+<p><strong>The failure modes are mundane and familiar.</strong> The dominant category is <em>instruction following</em>, and the specific pattern named in the lecture is worth writing down: models <strong>promise to consult the reference data and then don't</strong>, substituting something plausible from their own weights. Formatting errors follow. In a breakdown of one strong model, roughly half of outputs were "acceptable but sub-par", around a fifth genuinely good, and about 29% bad or unacceptable.</p>
+
+<div class="quiz" data-answer="a">
+  <span class="label">Check yourself</span>
+  <p class="q">Which finding should most change how you supervise an agent working from your reference files?</p>
+  <div class="opts">
+    <button class="opt">Models claim to have consulted the reference data but substitute their own recollection.</button>
+    <button class="opt">Win rates against professionals have climbed steadily from around 12% to the mid-40s.</button>
+    <button class="opt">The reliability horizon is roughly four times shorter than the headline capability horizon.</button>
+    <button class="opt">Roughly 70% of the benchmark's tasks require the model to interact with reference files.</button>
+  </div>
+  <div class="answer-reveal">
+    <p>It is the one that is invisible without checking. A wrong answer you can catch; a fabricated answer wearing the sentence "as shown in the attached file" defeats the check you were relying on. The operational consequence is concrete: log which files were actually read and assert that the cited ones appear in that log. C is the most important finding overall, but it changes your <em>deployment</em> decision rather than your <em>supervision</em> of a specific run.</p>
+  </div>
+</div>
+
+<h2>DeepScholarBench: three axes for research output</h2>
+
+<p>DeepScholarBench<a href="#s3">³</a> evaluates generative research synthesis — write the related-work section for a recent paper — and is refreshed monthly with new arXiv papers, which neatly sidesteps contamination. Its value here is the <strong>decomposition</strong>, which transfers directly to any research or analysis output:</p>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Axis</th><th>Asks</th><th>Finding</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Knowledge synthesis</strong></td><td>Is it coherent, and does it capture the key facts?</td><td>Systems write well and consistently miss key facts</td></tr>
+    <tr><td><strong>Retrieval quality</strong></td><td>Are the sources relevant, important, and comprehensive?</td><td>Weakest axis — foundational sources are routinely missed</td></tr>
+    <tr><td><strong>Verifiability</strong></td><td>Do the citations actually support the claims?</td><td>Varies widely; fluent synthesis and verifiability trade off</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>No existing system exceeds about 19% overall. That is a benchmark with enormous headroom, and its most sobering result is this: even when handed the <em>correct</em> sources, systems extract only around 50% of the key facts. The bottleneck is not only finding things — it is reading them properly.</p>
+
+<p class="sidenote">Note the failure the third axis catches: <strong>fluent, coherent, well-cited, and the citations don't support the claims</strong>. Synthesis quality and verifiability trade off against each other, and human reviewers are poorly placed to catch it because good prose suppresses scrutiny. If an agent produces written analysis for you, verifiability needs its own check — sampled claims traced back to sources — because reading it will not reveal the problem.</p>
+
+<h2>What to build for yourself</h2>
+
+<p>These benchmarks are orientation, not evidence about your workload. What transfers is their <em>method</em>:</p>
+
+<ul>
+  <li><strong>Anchor difficulty in human time.</strong> "How long would this take a competent colleague?" is available, intuitive, and immediately tells you which tasks to delegate — the METR data says models are strongest under a few hours and decline sharply beyond.</li>
+  <li><strong>Always report two reliability thresholds.</strong> What can it do half the time, and what can it do four times in five? The second number is your deployment decision; the first is your research direction.</li>
+  <li><strong>Score against a human baseline, not a rubric.</strong> "Better than what a colleague would produce" is a judgement you can actually make. A 1–10 score is not.</li>
+  <li><strong>Decompose quality into axes</strong> that fail independently — for analysis: is the synthesis right, is the sourcing complete, do the claims trace? A single score averages these into uselessness.</li>
+  <li><strong>Classify failures, always.</strong> Both benchmarks derive most of their value from failure-mode analysis. Never record "failed"; record <em>which</em> failure. The <a href="../reference/eval-playbook.html">eval playbook</a> has the taxonomy.</li>
+  <li><strong>Check the reference-data claim specifically.</strong> Given how common it is, an assertion that cited files appear in the read log is cheap and catches the field's most common instruction-following failure.</li>
+</ul>
+
+<p>Worth noting for the buy-or-tune decision from Lesson 9: GDPval found that <strong>retry loops helped</strong> — trying n times with self-correction produced meaningful cost and speed improvements over an unaided expert. Test-time compute shows up again as the cheapest available lever, now measured against professional work rather than benchmarks.</p>
+
+<div class="recall">
+  <span class="label">Retrieval practice</span>
+  <p class="prompt">Design the eval you would actually run for one workflow: the human-time anchor, the two reliability thresholds, the axes, and the one failure mode you most suspect. Be specific enough to start on Monday.</p>
+  <textarea placeholder="This is the deliverable of the whole course."></textarea>
+  <div class="model-answer">
+    <p>Worked example, an agent drafting weekly analysis notes. <em>Anchor:</em> tasks binned by how long they take you — 15 minutes, an hour, half a day. <em>Thresholds:</em> across 5 runs of 25 real tasks, report both "succeeded at least once" and "succeeded all five times"; expect the second to be far worse, and treat that as the honest number. <em>Axes:</em> (1) is the conclusion right, (2) does every figure trace to a query, (3) are the caveats present. Score each binary. <em>Suspected failure:</em> claiming to have used the latest data extract while actually using a stale one — checked by asserting the read log contains the file the note cites. Total setup: a day. It will tell you more than every benchmark in this lesson combined, because it is about your data.</p>
+  </div>
+</div>
+
+<h2>What you can now do</h2>
+<p>You can read an agent capability claim and ask the question that deflates it — <em>at what success rate?</em> You have three question types to choose between when designing an eval, a human-time anchor for difficulty, and the specific knowledge that instruction-following failures around reference data are the field's most common and least visible defect.</p>
+<p>Next: <a href="0013-long-horizon-and-context.html">Lesson 13 — long horizons and context</a>, which explains why the reliability gap exists at all.</p>
+
+<div class="ask">
+  <strong>This is the lesson to actually act on.</strong> Building the eval is a day's work and it changes every subsequent decision. Bring a workflow and we'll design the task set, the thresholds and the grading criteria together — and then argue about what the first results mean.
+</div>
+
+<div class="source-box">
+  <span class="label">Read one thing</span>
+  <ol>
+    <li id="s1"><strong>Read this one:</strong> <a href="https://arxiv.org/abs/2503.14499">Kwa et al., <em>Measuring AI Ability to Complete Long Tasks</em></a> (METR). Read the 50%-versus-80% horizon comparison; it is the single most decision-relevant chart in agent evaluation.</li>
+    <li id="s2"><a href="https://openai.com/index/gdpval/">OpenAI, <em>GDPval</em></a> — the task suite and win-rate methodology; a subset is on Hugging Face. Read the failure-mode section.</li>
+    <li id="s3"><a href="https://arxiv.org/abs/2508.20033">Stanford, <em>DeepScholarBench</em></a> — the three-axis decomposition, and a rare unsaturated benchmark.</li>
+    <li id="s4"><a href="https://www.youtube.com/watch?v=8JAqLnTaZu4">CS329A Lecture 8 — Agentic Evaluations and Long Horizon Tasks</a> (Tandon). Source for this lesson.</li>
+  </ol>
+</div>
+
+<nav class="lesson-nav">
+  <span><a href="0011-deep-research-agents.html">← Lesson 11</a></span>
+  <span><a href="../index.html">Index</a> · <a href="../reference/eval-playbook.html">Eval playbook</a></span>
+  <span><a href="0013-long-horizon-and-context.html">Lesson 13: Long horizons and context →</a></span>
+</nav>
+
+</main>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

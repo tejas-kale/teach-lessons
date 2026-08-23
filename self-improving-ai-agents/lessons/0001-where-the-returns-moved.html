@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 1 · Where the Returns Moved</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<link rel="stylesheet" href="../assets/quiz.css">
+</head>
+<body>
+<main class="page">
+
+<header class="masthead">
+  <p class="eyebrow">Lesson 1 of 14 · Self-Improving AI Agents</p>
+  <h1>Where the returns moved</h1>
+  <p class="standfirst">The single argument the whole course hangs off: making the model bigger stopped being the best way to spend a dollar, and three other places to spend it took over.</p>
+  <p class="meta">≈9 minutes · Gives you the map every later lesson is drawn on</p>
+</header>
+
+<p>You use agents every day. You have probably noticed that your leverage over them is uneven: sometimes a better prompt fixes everything, sometimes nothing you write helps, and occasionally a model upgrade silently solves a problem you had been engineering around for a month. That unevenness is not random. It reflects <em>which axis</em> of improvement your problem actually sits on — and there are now three axes, not one.</p>
+
+<h2>The old axis, and why it flattened</h2>
+
+<p>From roughly 2020 to 2024 the field had one dial. Kaplan et al.'s scaling laws<a href="#s1">¹</a> showed test loss falling predictably as you increased compute, dataset size, and parameter count — three log-log lines, all sloping down. BERT at 340M → GPT-2 at 1.5B → GPT-3 at 175B → PaLM at 540B. Each step bought measurable capability, and two capabilities appeared that nobody had ordered: robust few-shot learning, and chain-of-thought reasoning that only showed up above a size threshold.<a href="#s2">²</a></p>
+
+<p class="sidenote">"Emergence" is contested — some of it is an artefact of discontinuous metrics like exact-match accuracy. The contest doesn't matter for your purposes. What matters is that the era's answer to every capability question was <em>wait for the next model</em>, and that answer has expired.</p>
+
+<p>CS329A opens by stating the thing plainly: that curve began to saturate around 2024.<a href="#s3">³</a> Not stopped — saturated. Returns per unit of pre-training compute got small enough that the frontier labs went looking elsewhere. Where they went is the entire subject of this course, and of your job.</p>
+
+<h2>The three axes that replaced it</h2>
+
+<figure>
+<svg viewBox="0 0 660 300" role="img" aria-label="Diagram showing pre-training feeding into three axes: train-time scaling, test-time scaling, and a self-improvement loop connecting them.">
+  <rect x="20" y="120" width="130" height="58" rx="3" class="dg-box"/>
+  <text x="85" y="145" class="dg-label-b" text-anchor="middle">Pre-training</text>
+  <text x="85" y="163" class="dg-label" text-anchor="middle">flattening</text>
+
+  <line x1="150" y1="149" x2="215" y2="149" class="dg-rule" stroke-width="1.5"/>
+  <polygon points="215,145 224,149 215,153" class="dg-ink"/>
+
+  <rect x="228" y="34" width="180" height="66" rx="3" class="dg-box"/>
+  <text x="318" y="58" class="dg-label-b" text-anchor="middle">1 · Train-time scaling</text>
+  <text x="318" y="76" class="dg-label" text-anchor="middle">RL on verifiable rewards,</text>
+  <text x="318" y="90" class="dg-label" text-anchor="middle">post-training, distillation</text>
+
+  <rect x="228" y="198" width="180" height="66" rx="3" class="dg-box"/>
+  <text x="318" y="222" class="dg-label-b" text-anchor="middle">2 · Test-time scaling</text>
+  <text x="318" y="240" class="dg-label" text-anchor="middle">longer thinking, sampling,</text>
+  <text x="318" y="254" class="dg-label" text-anchor="middle">search, verification</text>
+
+  <path d="M 228 67 C 190 67 190 149 224 149" class="dg-rule" stroke-width="1.2" fill="none"/>
+  <path d="M 228 231 C 190 231 190 149 224 149" class="dg-rule" stroke-width="1.2" fill="none"/>
+
+  <path d="M 408 231 C 470 231 470 67 412 67" class="dg-stroke" stroke-width="1.6" fill="none" stroke-dasharray="5 4"/>
+  <polygon points="418,63 408,67 418,71" class="dg-ink"/>
+  <text x="530" y="140" class="dg-label-b" text-anchor="middle">3 · Self-improvement</text>
+  <text x="530" y="158" class="dg-label" text-anchor="middle">solutions found by spending</text>
+  <text x="530" y="172" class="dg-label" text-anchor="middle">compute at test time become</text>
+  <text x="530" y="186" class="dg-label" text-anchor="middle">training data for the next model</text>
+  <line x1="470" y1="118" x2="470" y2="132" class="dg-rule" stroke-width="1"/>
+</svg>
+<figcaption>Axis 3 is the one the course is named after. It is not a separate technique so much as a <em>loop</em>: test-time compute manufactures verified successes, those successes become supervision, and the cheaper model then reaches at pass@1 what the expensive procedure reached at pass@k. DeepSeek-R1 and the o-series are this loop, run at industrial scale.<a href="#s4">⁴</a></figcaption>
+</figure>
+
+<h3>Axis 1 — train-time scaling</h3>
+<p>Spend compute <em>before</em> deployment, but on reinforcement learning against checkable rewards rather than on more next-token prediction. Math with known answers, code with passing tests. This is where the reasoning models came from. As a practitioner you mostly <em>consume</em> this axis: it arrives as a model release. Lesson 8 covers the small slice you can act on.</p>
+
+<h3>Axis 2 — test-time scaling</h3>
+<p>Spend compute <em>during</em> the request: think longer, sample repeatedly, search over candidates, verify before returning. This axis is almost entirely under your control — it is a property of the harness you write, not of the weights. Lessons 2 through 7 live here, and this is where most of your available leverage is.</p>
+
+<h3>Axis 3 — self-improvement</h3>
+<p>Close the loop between the two. In its industrial form this means generating synthetic training data with an expensive test-time procedure and fine-tuning on the verified wins. In the form you will actually use, it means an agent that accumulates <em>verified experience</em> — notes, skills, corrected failure cases — and gets better without anyone touching the weights. Lesson 9.</p>
+
+<div class="callout">
+  <span class="label">The sentence to keep</span>
+  <p>Every technique in this course is an answer to one question: <strong>how do you convert compute into reliability?</strong> Pre-training answered "spend it on parameters". The current answer is "spend it on generating candidates, and spend the rest on checking them".</p>
+</div>
+
+<div class="quiz" data-answer="c">
+  <span class="label">Check yourself</span>
+  <p class="q">A vendor claims their agent "reasons for longer on hard problems and gets better results". Which axis is that claim about?</p>
+  <div class="opts">
+    <button class="opt">Train-time scaling, because reasoning behaviour has to be learned during training first.</button>
+    <button class="opt">Self-improvement, because the agent is adapting how it works to the problem.</button>
+    <button class="opt">Test-time scaling, because the extra compute is being spent during the request.</button>
+    <button class="opt">Pre-training scaling, because thinking capacity comes from the model's parameter count.</button>
+  </div>
+  <div class="answer-reveal">
+    <p>The compute is spent at inference, so it is axis 2. The distractors are all <em>true statements</em> that are answers to a different question — which is exactly how these claims blur in marketing copy. Sorting a claim onto the right axis tells you who controls the dial: axis 2 you can tune yourself, axis 1 you can only buy.</p>
+  </div>
+</div>
+
+<h2>Where verification enters, and why it never leaves</h2>
+
+<p>Axes 2 and 3 both quietly assume something: that you can tell a good output from a bad one. Sample a hundred solutions and one is right — you have gained nothing unless you can <em>find</em> it. Generate synthetic training data — it poisons the model unless you can filter it.</p>
+
+<p>The course names this directly in the first lecture, in an aside that turns out to be the whole plot: models can generate an enormous amount of plausible-looking material cheaply, and whether it is any good requires a feedback loop. Where the feedback is crisp — math, code, anything rule-based — improvement compounds. Where it isn't — creative work, strategy, most analysis — human judgement becomes the bottleneck, and robust verification stays hard.<a href="#s3">³</a></p>
+
+<p class="sidenote">The gap between "can produce" and "can recognise" has a name — the <em class="term">generation–verification gap</em> — and Lesson 4 is entirely about it. Notice that it reframes your problem usefully: "the model can't do this" is a wall, but "my verifier is too weak" is a to-do item.</p>
+
+<p>This is the most important thing to carry out of Lesson 1, because it changes what you build. Most people, facing a disappointing agent, work on the generator: better prompt, better model, more context. Often the generator was already producing a correct answer somewhere in its distribution, and the system threw it away.</p>
+
+<h2>What an agent actually is, structurally</h2>
+
+<p>The course uses a plain decomposition, matching Anthropic's workflow taxonomy<a href="#s5">⁵</a>. An agentic system is some arrangement of five ingredients:</p>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Ingredient</th><th>What it does</th><th>Covered in</th></tr></thead>
+  <tbody>
+    <tr><td><strong>LLM calls</strong></td><td>Generate candidate text or actions</td><td>Lesson 2</td></tr>
+    <tr><td><strong>Tool calls</strong></td><td>Touch the world — search, code execution, APIs, databases</td><td>Lesson 6</td></tr>
+    <tr><td><strong>Verifiers</strong></td><td>Check an output against ground truth: tests, types, schemas, executions</td><td>Lessons 4, 6</td></tr>
+    <tr><td><strong>Judges / critics</strong></td><td>Score an output where ground truth doesn't exist</td><td>Lesson 5</td></tr>
+    <tr><td><strong>Orchestration</strong></td><td>Chaining, routing, parallelisation, planner–worker, evaluator–optimiser</td><td>Lessons 7, 10</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Two things follow. First, when a run fails you can localise the failure to an ingredient rather than blaming "the model" — that diagnostic habit is what Lesson 12 formalises. Second, the ingredients you are most likely to be under-using are the middle two. Most working agents are LLM calls plus tools plus hope.</p>
+
+<div class="recall">
+  <span class="label">Retrieval practice</span>
+  <p class="prompt">Pick one agent workflow you actually run. Without scrolling up: which of the three axes is it currently exploiting, and which of the five ingredients does it lack? Two or three sentences.</p>
+  <textarea placeholder="Write it before revealing — this is the answer the rest of the course is aimed at."></textarea>
+  <div class="model-answer">
+    <p>The common shape: it is a single LLM call plus a few tools (axis 2, but only barely — one sample, no search), it has no verifier and no judge, and its "orchestration" is a prompt asking the model to be careful. That configuration has one improvement lever, the prompt, which is why prompt-tuning feels like the whole job. Adding a verifier gives you a second lever and, more importantly, a measurement. Keep whatever you wrote — Lesson 13 asks you to re-read it.</p>
+  </div>
+</div>
+
+<h2>What you can now do</h2>
+<p>You can sort any claim, paper, or product pitch onto one of three axes, and you know which of them you control. You know that verification, not generation, is the usual binding constraint. And you have a five-part vocabulary for describing what your own agents are made of — which is what makes the rest of this course actionable rather than interesting.</p>
+<p>Next: <a href="0002-the-dial-you-already-have.html">Lesson 2 — test-time compute, the dial you already have</a>, where the abstract "spend more at inference" becomes a specific set of things to change.</p>
+
+<div class="ask">
+  <strong>Your teacher is in this window.</strong> If the three-axis split feels too neat — it is a simplification, and reasonable people argue about where post-training ends and test-time begins — say so and we'll take it apart. Bring a real failing run and we can localise it against the five ingredients together.
+</div>
+
+<div class="source-box">
+  <span class="label">Read one thing</span>
+  <ol>
+    <li id="s1"><a href="https://arxiv.org/abs/2001.08361">Kaplan et al., <em>Scaling Laws for Neural Language Models</em></a> — read only §1 and the three headline figures. Seeing the straight lines is the point.</li>
+    <li id="s2"><a href="https://arxiv.org/abs/2206.07682">Wei et al., <em>Emergent Abilities of Large Language Models</em></a></li>
+    <li id="s3"><strong>Primary source for this lesson:</strong> <a href="https://www.youtube.com/watch?v=6YnLB0XbTnI">CS329A Lecture 1 — Course Overview</a> (Mirhoseini &amp; Tandon, Stanford, 2026). The first 30 minutes are the argument above, delivered by people who ran these experiments. Watch it before Lesson 2.</li>
+    <li id="s4"><a href="https://arxiv.org/abs/2501.12948">DeepSeek-AI, <em>DeepSeek-R1</em></a> — the most legible public description of axis 1 meeting axis 3.</li>
+    <li id="s5"><a href="https://www.anthropic.com/engineering/building-effective-agents">Anthropic, <em>Building Effective Agents</em></a> — the workflow taxonomy in the table, with code.</li>
+  </ol>
+</div>
+
+<nav class="lesson-nav">
+  <span><a href="../index.html">← Course index</a></span>
+  <span><a href="../reference/glossary.html">Glossary</a> · <a href="../reference/tuning-dials.html">Tuning dials</a></span>
+  <span><a href="0002-the-dial-you-already-have.html">Lesson 2: The dial you already have →</a></span>
+</nav>
+
+</main>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

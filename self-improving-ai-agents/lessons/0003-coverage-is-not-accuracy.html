@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 3 · Coverage Is Not Accuracy</title>
+<link rel="stylesheet" href="../assets/lesson.css">
+<link rel="stylesheet" href="../assets/quiz.css">
+</head>
+<body>
+<main class="page">
+
+<header class="masthead">
+  <p class="eyebrow">Lesson 3 of 14 · Self-Improving AI Agents</p>
+  <h1>Coverage is not accuracy</h1>
+  <p class="standfirst">The single most useful idea in the course: your agent probably already produced the right answer and then discarded it. The distance between those two facts has a name.</p>
+  <p class="meta">≈9 minutes · Lecture 2 · The idea the next four lessons all serve</p>
+</header>
+
+<p>Lesson 2 ended on an assumption we quietly smuggled in: that after drawing k samples you can pick the good one. Drop that assumption and the whole picture changes.</p>
+
+<p>Coverage — pass@k — is what your system <em>could</em> deliver with a perfect oracle sitting at the end. What it actually delivers is coverage minus whatever your selection mechanism gets wrong. That subtraction is the <em class="term">generation–verification gap</em>, and for most real workloads it is the dominant term.<a href="#s3">³</a></p>
+
+<figure>
+<svg viewBox="0 0 660 280" role="img" aria-label="Chart showing coverage rising steeply with sample count while majority voting plateaus, with the widening space between them labelled the generation-verification gap.">
+  <line x1="70" y1="230" x2="620" y2="230" class="dg-rule" stroke-width="1.2"/>
+  <line x1="70" y1="230" x2="70" y2="30" class="dg-rule" stroke-width="1.2"/>
+  <text x="345" y="262" class="dg-label" text-anchor="middle">number of samples, k (log scale)</text>
+  <text x="24" y="130" class="dg-label" text-anchor="middle" transform="rotate(-90 24 130)">solved</text>
+
+  <path d="M 70 195 C 180 130 300 85 620 50" class="dg-stroke" stroke-width="2.2" fill="none"/>
+  <text x="612" y="38" class="dg-label-b" text-anchor="end">coverage — pass@k (perfect selector)</text>
+
+  <path d="M 70 195 C 160 168 260 158 620 152" class="dg-stroke" stroke-width="2" fill="none" stroke-dasharray="6 4"/>
+  <text x="612" y="170" class="dg-label" text-anchor="end">best-of-n with a reward model</text>
+
+  <path d="M 70 197 C 150 182 240 176 620 174" class="dg-stroke" stroke-width="1.6" fill="none" stroke-dasharray="2 3"/>
+  <text x="612" y="192" class="dg-label" text-anchor="end">majority voting</text>
+
+  <line x1="470" y1="60" x2="470" y2="160" class="dg-rule" stroke-width="1"/>
+  <line x1="464" y1="60" x2="476" y2="60" class="dg-rule" stroke-width="1"/>
+  <line x1="464" y1="160" x2="476" y2="160" class="dg-rule" stroke-width="1"/>
+  <text x="484" y="105" class="dg-label-b" text-anchor="start">generation–</text>
+  <text x="484" y="120" class="dg-label-b" text-anchor="start">verification gap</text>
+  <text x="484" y="136" class="dg-label" text-anchor="start">answers you paid for</text>
+  <text x="484" y="150" class="dg-label" text-anchor="start">and threw away</text>
+
+  <g class="dg-label" text-anchor="middle">
+    <text x="70" y="248">1</text><text x="200" y="248">10</text><text x="345" y="248">100</text><text x="490" y="248">1k</text>
+  </g>
+</svg>
+<figcaption>Schematic of the pattern reported in Lecture 2 across MATH and GSM8K. The selection curves flatten after roughly 10–50 samples while coverage keeps climbing. Every extra sample beyond the plateau costs money and delivers nothing — unless you fix the selector. Harder benchmarks widen the gap.</figcaption>
+</figure>
+
+<h2>Why the obvious selectors plateau</h2>
+
+<p><strong>Majority voting</strong> (self-consistency<a href="#s4">⁴</a>) takes the most common answer. It works beautifully when the model is usually right and occasionally slips — the errors are idiosyncratic, the correct answer is modal. It fails exactly where you need help. On the hardest problems, Lecture 2 reports correct answers appearing once or twice in <em>ten thousand</em> samples. A rare correct answer is, by construction, invisible to a vote. Majority voting is a mechanism for suppressing noise, and on hard problems the correct answer <em>is</em> the outlier.</p>
+
+<p class="sidenote">This also explains a failure you have probably seen: an agent that becomes <em>more</em> confidently wrong when you ask it to check its work by trying several times. You have built a machine for reinforcing its modal error.</p>
+
+<p><strong>Reward-model ranking</strong> (best-of-n with a learned scorer) does better — it can in principle recognise a rare correct answer without needing it to be popular. But learned reward models inherit the same blind spots as the generator, degrade off-distribution, and are trained on preferences that are only a proxy for correctness. In the MATH results the gap to true coverage stays large.</p>
+
+<p>The general lesson: <strong>selectors that only look at the text are weak</strong>. Both failing methods judge answers by comparing them to each other or to a learned prior. Neither one contacts reality.</p>
+
+<div class="quiz" data-answer="d">
+  <span class="label">Check yourself</span>
+  <p class="q">You raise k from 10 to 200 with majority-vote selection and accuracy barely moves. What has most likely happened?</p>
+  <div class="opts">
+    <button class="opt">The model has reached its capability ceiling and cannot solve the remaining items.</button>
+    <button class="opt">The sampling temperature is too low, so the extra draws are near-duplicates.</button>
+    <button class="opt">The tasks are too easy, so extra samples have nothing left to contribute here.</button>
+    <button class="opt">The selector has saturated, so newly-covered answers are generated and discarded.</button>
+  </div>
+  <div class="answer-reveal">
+    <p>You cannot distinguish these from the accuracy number alone — which is the point. Measure coverage separately, with an oracle or with careful manual grading on a small slice. If coverage rose while accuracy stayed flat, the bottleneck is selection, and buying a better model would be spending money on the wrong thing. If coverage also stayed flat, then B or A is live. Two numbers, entirely different diagnoses.</p>
+  </div>
+</div>
+
+<h2>Where verification is easy, and where it is not</h2>
+
+<p>The gap closes when you have something that contacts ground truth. Lecture 2 lays out the domains where that is cheap, and they have a common structure: <strong>checking is a fundamentally easier problem than producing</strong>.</p>
+
+<div class="scroll-x">
+<table>
+  <thead><tr><th>Domain</th><th>Verifier</th><th>Why it's easy</th></tr></thead>
+  <tbody>
+    <tr><td>Formal maths</td><td>Proof checker (Lean, Coq)</td><td>Validity is mechanically decidable</td></tr>
+    <tr><td>Code</td><td>Unit tests, type checker, compiler</td><td>Writing a test is far cheaper than writing the program</td></tr>
+    <tr><td>Kernel / compiler generation</td><td>Differential testing — run both, compare outputs</td><td>A reference implementation already exists</td></tr>
+    <tr><td>Language / format translation</td><td>Round-trip or equivalence checks</td><td>Same as above: the source is the oracle</td></tr>
+    <tr><td>Data pipelines <em>(yours)</em></td><td>Schema checks, row counts, invariants, reconciliation against a known total</td><td>You already write these; you just don't feed them back to the agent</td></tr>
+    <tr><td>Analysis, writing, strategy</td><td>—</td><td>No oracle. This is where the gap lives, and Lessons 5 and 6 are about it.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>The row that should interest you most is the fifth. Data work is unusually rich in cheap partial verifiers that practitioners already trust and already write — and then use only as a post-hoc alarm for humans, rather than as a signal the agent can iterate against. Turning an existing assertion into an agent-visible check is the highest ratio of leverage to effort available in this entire course.</p>
+
+<div class="callout">
+  <span class="label">Verifiers are not free of error either</span>
+  <p>Lecture 2 is candid about this. Unit tests with poor coverage pass bad code. Automated grading of MATH answers was manually spot-checked at roughly 97–98% agreement — good, not perfect. A weak verifier does not merely fail to help; under heavy sampling it becomes a target to be gamed, since drawing a thousand samples is an efficient search for whatever your check does <em>not</em> examine. Lesson 5 makes this precise.</p>
+</div>
+
+<h2>The reframe worth stealing</h2>
+
+<p>When an agent underperforms, the instinctive move is to work on the generator: better prompt, better model, more context. The gap says: measure first, because there are two different diseases with identical symptoms.</p>
+
+<ul>
+  <li><strong>Low coverage.</strong> Even the best of k attempts is wrong. This is a genuine capability problem. Better model, better tools, better decomposition (Lesson 8).</li>
+  <li><strong>High coverage, low accuracy.</strong> The answer is in there and you are picking the wrong one. Nothing about the generator needs to change. Build a verifier (Lessons 4–7).</li>
+</ul>
+
+<p>The second case is enormously more common than practitioners assume, and it is also the cheaper one to fix. "The model can't do this" is a wall. "My selector is weak" is a ticket.</p>
+
+<div class="recall">
+  <span class="label">Retrieval practice</span>
+  <p class="prompt">Design the smallest experiment that would tell you which of the two diseases one of your own agent workflows has. Be concrete: what do you run, what do you record, what does each outcome imply?</p>
+  <textarea placeholder="Write it out — this is the experiment Lesson 12 formalises."></textarea>
+  <div class="model-answer">
+    <p>Take 20–30 real tasks with known-good outcomes. Run each 10 times. Record two numbers: how often run 1 succeeded (≈ pass@1, what you ship today) and how often <em>any</em> of the 10 succeeded (coverage). If coverage is much higher, you have a selection problem and your next build is a verifier. If coverage is barely above pass@1, extra sampling is wasted and you need capability — a stronger model, better tools, or a different task decomposition. Total cost: a few hundred calls and an afternoon of grading. Almost nobody does this, which is why almost everybody guesses.</p>
+  </div>
+</div>
+
+<h2>What you can now do</h2>
+<p>You can name the generation–verification gap, explain why majority voting and reward-model ranking both plateau, and — most importantly — you have a two-number diagnostic that tells you whether to invest in the generator or the selector. That diagnostic is the backbone of the evaluation work in Lessons 12 and 13.</p>
+<p>Next: <a href="0004-what-counts-as-a-verifier.html">Lesson 4 — what counts as a verifier</a>, where outcome and process reward models get separated and the taxonomy gets sharp.</p>
+
+<div class="ask">
+  <strong>Push back on this one.</strong> The gap framing is powerful enough to be over-applied — some tasks really are capability-limited, and hunting for a verifier there wastes weeks. If you suspect one of yours is, describe it and we'll argue it through.
+</div>
+
+<div class="source-box">
+  <span class="label">Read one thing</span>
+  <ol>
+    <li id="s3"><strong>Primary source:</strong> <a href="https://www.youtube.com/watch?v=-Ggc37xLj_Y">CS329A Lecture 2 — Test-Time Compute Scaling</a>, the section contrasting coverage with majority voting and reward-model selection. The gap is stated most plainly there.</li>
+    <li id="s4"><a href="https://arxiv.org/abs/2203.11171">Wang et al., <em>Self-Consistency Improves Chain of Thought Reasoning</em></a> — read it as the strongest case <em>for</em> majority voting, then note the conditions it needs.</li>
+    <li id="s5"><a href="https://arxiv.org/abs/2407.21787">Brown et al., <em>Large Language Monkeys</em></a>, §5 — the sample sets are published, so you can inspect what "correct once in ten thousand" actually looks like.</li>
+  </ol>
+</div>
+
+<nav class="lesson-nav">
+  <span><a href="0002-the-dial-you-already-have.html">← Lesson 2</a></span>
+  <span><a href="../index.html">Index</a> · <a href="../reference/glossary.html">Glossary</a></span>
+  <span><a href="0004-what-counts-as-a-verifier.html">Lesson 4: What counts as a verifier →</a></span>
+</nav>
+
+</main>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>
