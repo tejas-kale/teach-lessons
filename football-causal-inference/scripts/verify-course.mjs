@@ -26,8 +26,19 @@ for (const name of lessons) {
   }
 }
 
-for (const name of ['MISSION.md', 'NOTES.md', 'RESOURCES.md', 'README.md', 'assets/course.css', 'assets/quiz.js', 'assets/dag.svg', 'reference/glossary.html', 'reference/design-field-guide.html']) {
+for (const name of ['MISSION.md', 'NOTES.md', 'RESOURCES.md', 'README.md', 'index.html', 'assets/course.css', 'assets/quiz.js', 'assets/dag.svg', 'reference/glossary.html', 'reference/design-field-guide.html']) {
   if (!existsSync(join(root, name))) errors.push(`Missing ${name}`);
+}
+
+const indexFile = join(root, 'index.html');
+if (existsSync(indexFile)) {
+  const indexHtml = readFileSync(indexFile, 'utf8');
+  const lessonLinks = [...indexHtml.matchAll(/href="(lessons\/[^"]+\.html)"/g)].map((match) => match[1]);
+  if (lessonLinks.length !== 17) errors.push(`index.html: expected 17 lesson links, found ${lessonLinks.length}`);
+  for (const [, href] of indexHtml.matchAll(/href="([^"]+)"/g)) {
+    if (/^(https?:|#)/.test(href)) continue;
+    if (!existsSync(resolve(root, href))) errors.push(`index.html: broken local link ${href}`);
+  }
 }
 
 for (const name of ['0003-dags-and-back-door-identification.html', '0004-emulate-a-target-trial.html', '0006-weighting-standardisation-and-aipw.html', '0014-longitudinal-g-methods.html']) {
@@ -39,4 +50,4 @@ if (errors.length) {
   console.error(errors.join('\n'));
   process.exit(1);
 }
-console.log(`Verified ${lessons.length} lessons, minimum lesson length, equal-word quiz options, local links, shared assets and evidence-gap labels.`);
+console.log(`Verified ${lessons.length} lessons, index links, minimum lesson length, equal-word quiz options, local links, shared assets and evidence-gap labels.`);
