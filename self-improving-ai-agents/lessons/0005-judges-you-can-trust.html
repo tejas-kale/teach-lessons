@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Lesson 5 · Judges You Can Trust</title>
+<title>Lesson 5 · Judges you can trust</title>
 <link rel="stylesheet" href="../assets/lesson.css">
 <link rel="stylesheet" href="../assets/quiz.css">
 </head>
@@ -11,15 +11,15 @@
 <main class="page">
 
 <header class="masthead">
-  <p class="eyebrow">Lesson 5 of 14 · Self-Improving AI Agents</p>
+  <p class="eyebrow">Lesson 5 of 17 · Arc II · Self-improving AI agents</p>
   <h1>Judges you can trust</h1>
-  <p class="standfirst">Most of your work has no unit test. The state of the art there is not a better judge — it is several mediocre ones, weighted properly, with the bad ones thrown out first.</p>
-  <p class="meta">≈11 minutes · Lecture 3 · The most directly usable technique in the course</p>
+  <p class="standfirst">Most of your work has no unit test. The state of the art there is not a better judge. It is several mediocre ones, weighted properly, with the worst ones removed first.</p>
+  <p class="meta">About 11 minutes · Lecture 3 · The most directly usable technique in the course</p>
 </header>
 
-<p>Formal proofs and unit tests are wonderful and irrelevant to most of what you do. Is this analysis sound? Is this summary faithful to the source? Did the agent pick a sensible modelling approach? None of these have an oracle, and the default fallback — ask a strong model whether the answer is good — is a <em class="term">weak verifier</em>: correlated with correctness, reliably imperfect.</p>
+<p>Formal proofs and unit tests are wonderful and irrelevant to most of what you do. Is this analysis sound? Is this summary faithful to the source? Did the agent pick a sensible modelling approach? None of these has an oracle, and the usual fallback of asking a strong model whether the answer is good gives you a <em class="term">weak verifier</em>, meaning one that correlates with correctness and is reliably imperfect.</p>
 
-<p>The insight of the Weaver line of work<a href="#s1">¹</a> is to stop trying to fix that. Accept that every available verifier is weak, and combine many of them into one strong signal — spending inference compute on <em>verification</em> rather than on more generation.</p>
+<p>The Weaver line of work stops trying to fix that.<a href="#s1">¹</a> It accepts that every available verifier is weak and combines many of them into one strong signal, which spends inference compute on verification rather than on more generation.</p>
 
 <h2>The pipeline: score, weight, select</h2>
 
@@ -64,23 +64,23 @@
   <text x="342" y="196" class="dg-label" text-anchor="middle">the step people skip —</text>
   <text x="342" y="211" class="dg-label" text-anchor="middle">and the one that matters most</text>
 </svg>
-<figcaption>Three steps, in order. Filtering first is not optional: a verifier below a quality floor does not merely add noise, it actively degrades the ensemble. This is why "ask three models and take the majority" so often disappoints — no filtering, no weighting, and no check that the three are looking at different things.</figcaption>
+<figcaption>Three steps, in order. Filtering first is not optional, because a verifier below a quality floor does not merely add noise, it degrades the ensemble. This is why "ask three models and take the majority" so often disappoints. There is no filtering, no weighting, and no check that the three are looking at different things.</figcaption>
 </figure>
 
-<h3>Step 1 — filter</h3>
-<p>With even a small labelled set you can measure each verifier's agreement with truth and eject the ones that are barely better than chance on your data. A verifier that is excellent on a public benchmark may be useless on your domain. Measure on <em>your</em> tasks.</p>
+<h3>Step 1, filter</h3>
+<p>With even a small labelled set you can measure each verifier's agreement with truth and remove the ones that are barely better than chance on your data. A verifier that is excellent on a public benchmark may be useless on your domain, so measure on your own tasks.</p>
 
-<h3>Step 2 — weight</h3>
-<p>Naive averaging helps, but not monotonically — adding verifiers can make it worse. Learned weights help reliably. With labels, logistic regression over verifier scores is enough. Without them, weak supervision in the Snorkel tradition<a href="#s2">²</a> estimates each verifier's accuracy from the <em>structure of their agreements and disagreements</em>, no labels required. Weaver reports strong results using around 1% of the training labels.</p>
+<h3>Step 2, weight</h3>
+<p>Naive averaging helps, but not reliably, and adding verifiers can make it worse. Learned weights help consistently. If you have labels, logistic regression over verifier scores is enough. If you do not, weak supervision in the Snorkel tradition estimates each verifier's accuracy from the structure of their agreements and disagreements, with no labels required.<a href="#s2">²</a> Weaver reports strong results using around 1 percent of the training labels.</p>
 
-<p class="sidenote">The assumption underneath weak supervision is that verifiers make <strong>independent</strong> errors. It is exactly the assumption that fails when your "ensemble" is one model prompted three ways — those errors are near-perfectly correlated, so you gain almost nothing. Diversity of <em>mechanism</em> is what buys you signal: a rubric judge, a tool check, and a trained reward model disagree in different directions. Two prompts of the same model do not.</p>
+<p class="sidenote">Weak supervision assumes verifiers make <strong>independent</strong> errors. That assumption fails when your ensemble is one model prompted three ways, because those errors are almost perfectly correlated and you gain almost nothing. Diversity of mechanism is what buys signal. A rubric judge, a tool check, and a trained reward model disagree in different directions, and two prompts of the same model do not.</p>
 
-<h3>Step 3 — select</h3>
-<p>Take the weighted-best candidate. The reported effect is large: on hard benchmarks such as GPQA-Diamond and MMLU-Pro, moving from roughly 40% to over 70%, with a Llama-3.1-8B generator plus a pool of ≤8B verifiers reaching approximately what a 70B model reaches under majority voting — and the 70B-class version approaching a frontier reasoning model. These are end-to-end accuracies, not coverage.<a href="#s1">¹</a></p>
+<h3>Step 3, select</h3>
+<p>Take the weighted-best candidate. The reported effect is large. On hard benchmarks such as GPQA-Diamond and MMLU-Pro, accuracy moved from roughly 40 percent to over 70 percent. A Llama-3.1-8B generator with a pool of verifiers of 8B parameters or smaller reached about what a 70B model reaches under majority voting, and the 70B-class version approached a frontier reasoning model. These are end-to-end accuracies rather than coverage.<a href="#s1">¹</a></p>
 
 <div class="callout">
   <span class="label">The cost problem, and its answer</span>
-  <p>Running twenty verifiers over a hundred candidates is expensive. Weaver's answer is distillation: train the ensemble once, then compress it into a single small model. A distilled verifier of roughly 400M parameters retained about 97% of the pool's accuracy at a fraction of a percent of its inference cost. If you build a good judging ensemble, you can eventually stop paying for it.</p>
+  <p>Running twenty verifiers over a hundred candidates is expensive. Weaver's answer is distillation. Train the ensemble once, then compress it into a single small model. A distilled verifier of roughly 400M parameters kept about 97 percent of the pool's accuracy at a fraction of a percent of its inference cost. If you build a good judging ensemble, you can eventually stop paying for it.</p>
 </div>
 
 <div class="quiz" data-answer="c">
@@ -93,68 +93,74 @@
     <button class="opt">Prompted judges cannot output the calibrated probabilities that weighting requires.</button>
   </div>
   <div class="answer-reveal">
-    <p>Independence is the load-bearing assumption. Three prompts of one model share training data, blind spots, and stylistic preferences, so when the model is wrong all three are wrong together — you have paid triple for one opinion. The fix is diversity of mechanism: a different model family, a rubric that examines a different property, and at least one non-LLM check. D is a real nuisance in practice, but not the reason here.</p>
+    <p>Independence is the load-bearing assumption. Three prompts of one model share training data, blind spots, and stylistic preferences, so when the model is wrong all three are wrong together and you have paid three times for one opinion. The fix is diversity of mechanism, meaning a different model family, a rubric that examines a different property, and at least one check that is not an LLM. The fourth answer describes a real nuisance, but it is not the reason here.</p>
   </div>
 </div>
 
 <h2>Known biases of LLM judges</h2>
 
-<p>Before you deploy any of this, know how the individual pieces fail. These are established results, mostly from the MT-Bench work<a href="#s3">³</a>, and they are not subtle:</p>
+<p>Before you deploy any of this, know how the individual pieces fail. These are established results, mostly from the MT-Bench work, and they are not subtle.<a href="#s3">³</a></p>
 
 <div class="scroll-x">
 <table>
   <thead><tr><th>Bias</th><th>What happens</th><th>Cheap mitigation</th></tr></thead>
   <tbody>
-    <tr><td><strong>Position</strong></td><td>In pairwise comparison, the first-presented answer wins more than it should</td><td>Evaluate both orderings; keep only the consistent verdicts</td></tr>
-    <tr><td><strong>Verbosity</strong></td><td>Longer answers score higher regardless of quality</td><td>Constrain length; score specific claims, not overall impression</td></tr>
-    <tr><td><strong>Self-preference</strong></td><td>Models favour text from their own family</td><td>Judge with a different family than the generator</td></tr>
-    <tr><td><strong>Style over substance</strong></td><td>Confident, well-formatted, wrong beats hesitant and right</td><td>Force the judge to cite evidence before scoring</td></tr>
-    <tr><td><strong>Poor calibration</strong></td><td>Scores cluster at 4 and 5 out of 5; the scale carries no information</td><td>Use binary criteria; a checklist of yes/no items, then sum</td></tr>
+    <tr><td><strong>Position</strong></td><td>In a pairwise comparison the first answer shown wins more often than it should</td><td>Evaluate both orderings and keep only the consistent verdicts</td></tr>
+    <tr><td><strong>Verbosity</strong></td><td>Longer answers score higher regardless of quality</td><td>Constrain length, and score specific claims rather than overall impression</td></tr>
+    <tr><td><strong>Self-preference</strong></td><td>Models favour text from their own family</td><td>Judge with a different family from the generator</td></tr>
+    <tr><td><strong>Style over substance</strong></td><td>Confident, well-formatted and wrong beats hesitant and right</td><td>Make the judge cite evidence before it scores</td></tr>
+    <tr><td><strong>Poor calibration</strong></td><td>Scores cluster at 4 and 5 out of 5, so the scale carries no information</td><td>Use binary criteria, meaning a checklist of yes-or-no items that you then sum</td></tr>
   </tbody>
 </table>
 </div>
 
-<p>The last row is the one that quietly ruins most homegrown eval suites. "Rate this analysis 1–10" produces a number with almost no variance and no meaning. "Does it state its assumptions? Does every figure trace to the source data? Does it name a limitation?" produces three facts you can act on. <strong>Decompose the judgement until each part is nearly objective</strong> — that is the practical residue of the whole PRM idea from Lesson 4.</p>
+<p>The last row quietly ruins most homegrown eval suites. "Rate this analysis from 1 to 10" produces a number with almost no variance and no meaning. "Does it state its assumptions? Does every figure trace to the source data? Does it name a limitation?" produces three facts you can act on. <strong>Decompose the judgement until each part is nearly objective</strong>, which is the practical residue of the PRM idea from Lesson 4.</p>
 
-<p class="sidenote">A caution from the lecture: multi-agent verification by rubric prompting alone sometimes performed <em>worse</em> than plain majority voting. A rubric is not automatically an improvement. It has to be validated against labels like anything else, which is the entire content of the next paragraph.</p>
+<p class="sidenote">A caution from the lecture: multi-agent verification by rubric prompting alone sometimes performed worse than plain majority voting. A rubric is not automatically an improvement, and it has to be validated against labels like anything else.</p>
 
 <h2>Build one this week</h2>
 
-<p>The minimum viable version, for one workflow you own:</p>
+<p>Here is the smallest version that works, for one workflow you own.</p>
 
-<ol>
-  <li><strong>Label 30–50 real outputs</strong> yourself, good/bad. This is the whole cost, and there is no substitute for it — everything downstream is calibrated against these labels.</li>
-  <li><strong>Write three or four independent checks.</strong> Aim for genuine diversity: one deterministic (schema, totals, a recomputation), one rubric-based checklist from a different model family, one that inspects the reasoning rather than the answer.</li>
-  <li><strong>Score your labelled set with each.</strong> Now you know each check's precision and recall. Drop anything near chance.</li>
-  <li><strong>Fit weights</strong> — logistic regression on 50 points is entirely adequate, and beats your intuition about which check to trust.</li>
-  <li><strong>Re-measure the gap.</strong> Rerun the Lesson 3 diagnostic. Selected accuracy should have moved toward coverage. If it did not, your checks are correlated with each other or with the generator's errors.</li>
+<ol class="steps">
+  <li><strong>Label 30 to 50 real outputs yourself, good or bad.</strong> This is the whole cost, and there is no substitute for it, because everything downstream is calibrated against these labels.</li>
+  <li><strong>Write three or four independent checks.</strong> Aim for real diversity: one deterministic check such as a schema, a total, or a recomputation, one rubric checklist from a different model family, and one that inspects the reasoning rather than the answer.</li>
+  <li><strong>Score your labelled set with each check.</strong> Now you know each one's precision and recall, and you can drop anything near chance.</li>
+  <li><strong>Fit weights.</strong> Logistic regression on 50 points is entirely adequate and beats your intuition about which check to trust.</li>
+  <li><strong>Re-measure the gap.</strong> Rerun the Lesson 3 diagnostic. Selected accuracy should have moved toward coverage, and if it did not, your checks are correlated with each other or with the generator's errors.</li>
 </ol>
 
-<p>An afternoon's work, and it converts "the agent seems better lately" into a number. It also gives you a reusable component: the same ensemble is your eval harness in Lesson 12, your selector in Lesson 6, and your data filter in Lesson 10.</p>
+<p>That is an afternoon of work, and it converts "the agent seems better lately" into a number. It also gives you a component you reuse three more times, because the same ensemble is your eval harness in Lesson 12, your selector in Lesson 6, and your training-data filter in Lesson 9.</p>
+
+<div class="project-hook">
+  <span class="label">Project hook</span>
+  <p class="question">How much of the ensemble's benefit comes from weighting rather than from simply having more checks? Build the pool, then compare three selection rules on the same candidates: unweighted majority, learned weights from labels, and weak-supervision weights with no labels.</p>
+  <p class="measure"><span>Measure</span> Selected accuracy under each rule, plus the pairwise error correlation between your verifiers. The correlation number explains the accuracy number, and reporting both is what makes this a result rather than an anecdote.</p>
+</div>
 
 <div class="recall">
   <span class="label">Retrieval practice</span>
-  <p class="prompt">Sketch a three-verifier ensemble for a workflow you run — one deterministic, one rubric, one reasoning-focused. For each, name the failure it would <em>miss</em>.</p>
-  <textarea placeholder="The misses are the point: if all three miss the same thing, you have one verifier."></textarea>
+  <p class="prompt">Sketch a three-verifier ensemble for a workflow you run, with one deterministic, one rubric, and one reasoning-focused. For each one, name the failure it would miss.</p>
+  <textarea placeholder="The misses are the point. If all three miss the same thing, you have one verifier."></textarea>
   <div class="model-answer">
-    <p>Worked example, agent-written SQL analysis. (1) <em>Deterministic:</em> query runs, row counts within expected bounds, totals reconcile to a known aggregate. Misses: a correct-executing query that answers the wrong question. (2) <em>Rubric judge:</em> checklist — are the join keys right, is the date filter stated, are nulls handled? Misses: subtle semantic errors in business logic it has no context for. (3) <em>Reasoning check:</em> a different model reads the stated intent and the query and reports mismatches. Misses: anything requiring the actual data. Note that all three miss "the underlying table is stale" — which tells you the fourth check to write, and is exactly what this exercise is for.</p>
+    <p>Here is a worked example for agent-written SQL analysis. The deterministic check confirms the query runs, row counts fall within expected bounds, and totals reconcile to a known aggregate, and it misses a correctly executing query that answers the wrong question. The rubric judge asks whether the join keys are right, whether the date filter is stated, and whether nulls are handled, and it misses subtle errors in business logic it has no context for. The reasoning check has a different model read the stated intent alongside the query and report mismatches, and it misses anything that requires looking at the actual data. All three miss the case where the underlying table is stale, which tells you the fourth check to write. That is what this exercise is for.</p>
   </div>
 </div>
 
 <h2>What you can now do</h2>
-<p>You can build a defensible judge: filter, weight, select; independence of mechanism; binary criteria over Likert scales; a named list of biases to design against. And you know the escape hatch when the ensemble gets expensive — distil it.</p>
-<p>Next: <a href="0006-inference-architectures.html">Lesson 6 — inference architectures</a>, where the pieces from Lessons 2 to 5 get assembled, and one surprisingly powerful operation you have not met yet.</p>
+<p>You can build a judge you can defend. Filter, weight, then select. Insist on independence of mechanism. Prefer binary criteria to rating scales. Design against a named list of biases. And you know the escape hatch when the ensemble gets expensive, which is to distil it.</p>
+<p>Next is <a href="0006-inference-architectures.html">Lesson 6, inference architectures</a>, where the pieces from Lessons 2 to 5 get assembled, along with one powerful operation you have not met yet.</p>
 
 <div class="ask">
-  <strong>Bring your rubric.</strong> Judge prompts fail in specific, fixable ways, and a second pair of eyes on the wording is worth more than another paper. Paste one in and we'll take it apart against the bias table.
+  <strong>Bring your rubric.</strong> Judge prompts fail in specific and fixable ways, and a second pair of eyes on the wording is worth more than another paper. Paste one in and we will take it apart against the bias table.
 </div>
 
 <div class="source-box">
   <span class="label">Read one thing</span>
   <ol>
-    <li id="s1"><strong>Primary source:</strong> <a href="https://www.youtube.com/watch?v=p7TdPUcPoik">CS329A Lecture 3 — Robust Verification</a>, final section, presenting <em>Weaver: shrinking the generation–verification gap with weak verifiers</em> (Mirhoseini's lab, NeurIPS 2025). Model and distilled-verifier checkpoints are open-sourced.</li>
-    <li id="s2"><a href="https://arxiv.org/abs/1711.10160">Ratner et al., <em>Snorkel: Rapid Training Data Creation with Weak Supervision</em></a> — the label-model machinery Weaver borrows. Likely already familiar; the reframe onto verifiers is what's new.</li>
-    <li id="s3"><a href="https://arxiv.org/abs/2306.05685">Zheng et al., <em>Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena</em></a> — read §3 on biases, and treat it as a design checklist rather than a paper.</li>
+    <li id="s1"><strong>Primary source:</strong> <a href="https://www.youtube.com/watch?v=p7TdPUcPoik">CS329A Lecture 3, Robust Verification</a>, final section, presenting <em>Weaver: shrinking the generation-verification gap with weak verifiers</em> from Mirhoseini's lab, NeurIPS 2025. The model and distilled-verifier checkpoints are open source.</li>
+    <li id="s2"><a href="https://arxiv.org/abs/1711.10160">Ratner et al., <em>Snorkel: Rapid Training Data Creation with Weak Supervision</em></a>, the label-model machinery Weaver borrows. You may know it already, and the reframing onto verifiers is what is new.</li>
+    <li id="s3"><a href="https://arxiv.org/abs/2306.05685">Zheng et al., <em>Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena</em></a>. Read section 3 on biases and treat it as a design checklist rather than as a paper.</li>
   </ol>
 </div>
 

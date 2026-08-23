@@ -9,7 +9,7 @@ _Last updated: 2026-08-23_
 | Course | Lessons | Read | Progress |
 |---|---|---|---|
 | [FX & Central Banks](fx-and-central-banks/) | 4 | 2 | ▓▓▓▓▓░░░░░ 50% — in progress |
-| [Self-Improving AI Agents](self-improving-ai-agents/) | 14 | 0 | ░░░░░░░░░░ 0% — not started |
+| [Self-Improving AI Agents](self-improving-ai-agents/) | 17 | 0 | ░░░░░░░░░░ 0% — not started, reworked 23 Aug |
 
 ## Foreign Exchange & Central Banks
 
@@ -30,7 +30,7 @@ Built 20 August 2026, four lessons, ≈30 minutes end to end. Spine: *The Econom
 
 ## Self-Improving AI Agents
 
-Built 21 August 2026 from Stanford CS329A transcripts. Fourteen lessons in four arcs. Whole arc written up front, so it reflects inferred level rather than demonstrated learning.
+Built 21 August 2026 from Stanford CS329A transcripts. Reworked 23 August 2026: rewritten in plain style, and extended from fourteen lessons to seventeen with a new Arc V on running a course-project-scale experiment. Every lesson now carries a project hook, which is a testable question that lesson raises.
 
 | Arc | Lessons | Status |
 |---|---|---|
@@ -38,7 +38,10 @@ Built 21 August 2026 from Stanford CS329A transcripts. Fourteen lessons in four 
 | II · Verification | 4–7 | ⬜ Not read |
 | III · Getting better over time | 8–11 | ⬜ Not read |
 | IV · Measuring it | 12–14 | ⬜ Not read |
+| V · Answering one question yourself | 15–17 | ⬜ Not read |
 
 **Where to start:** Lesson 1, then run Lesson 3's two-number test for real. Lesson 1's retrieval question is the intended diagnostic for whether the pacing assumption held.
 
-**Learning records:** [0001 — practitioner, not researcher](self-improving-ai-agents/learning-records/0001-practitioner-not-researcher.md), [0002 — course built from transcripts](self-improving-ai-agents/learning-records/0002-course-built-from-transcripts.md), [0003 — the three bottlenecks](self-improving-ai-agents/learning-records/0003-the-three-bottlenecks.md), [0004 — Part 04 correction](self-improving-ai-agents/learning-records/0004-part-04-correction.md)
+**The project:** Arc V expects one experiment on your own workflows, at two to four weeks part-time. It does not need to wait until Lesson 15 — the hooks accumulate from Lesson 1, and the one you keep returning to is the one to run.
+
+**Learning records:** [0001 — practitioner, not researcher](self-improving-ai-agents/learning-records/0001-practitioner-not-researcher.md) (amended) · [0002 — course built from transcripts](self-improving-ai-agents/learning-records/0002-course-built-from-transcripts.md) · [0003 — the three bottlenecks](self-improving-ai-agents/learning-records/0003-the-three-bottlenecks.md) · [0004 — Part 04 correction](self-improving-ai-agents/learning-records/0004-part-04-correction.md) · [0005 — mission widened to include a project](self-improving-ai-agents/learning-records/0005-mission-widened-to-include-a-project.md)

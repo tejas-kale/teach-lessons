@@ -14,15 +14,17 @@ Ordered by trust. Anything used to make a claim in a lesson should appear here.
 
 | # | Lecture | Feeds lessons |
 |---|---------|---------------|
-| 1 | Course Overview | 01, 02 |
-| 2 | Test-Time Compute Scaling | 02, 03 |
+| 1 | Course Overview | 01, and the project standard in 15 |
+| 2 | Test-Time Compute Scaling | 02, 03, 06 |
 | 3 | Robust Verification | 04, 05 |
-| 4 | Learning from Feedback with Tools/Code | 06 |
-| 5 | Planning and Multi-Step Reasoning | 07 |
-| 6 | Train-Time Scaling / Scaling RL | 08 |
-| 7 | Self-Improvement and Deep Research Agents | 09, 10 |
-| 8 | Agentic Evaluations and Long-Horizon Tasks | 11, 12 |
-| 9 | Future Research Areas | 13 |
+| 4 | Learning from Feedback with Tools/Code | 07 |
+| 5 | Planning and Multi-Step Reasoning | 08, 09 |
+| 6 | Train-Time Scaling / Scaling RL | 09 |
+| 7 | Self-Improvement and Deep Research Agents | 10, 11 |
+| 8 | Agentic Evaluations and Long-Horizon Tasks | 12, 13 |
+| 9 | Future Research Areas | 14, and the project shortlist in 15 |
+
+Lessons 16 and 17 draw on experimental method rather than on a lecture. See Tier 4 below.
 
 ---
 
@@ -57,7 +59,7 @@ Grouped by the lesson that leans on them.
 - Shinn et al., *Reflexion: Language Agents with Verbal Reinforcement Learning* — [arXiv:2303.11366](https://arxiv.org/abs/2303.11366)
 - Gehring et al., *RLEF: Grounding Code LLMs in Execution Feedback* — [arXiv:2410.02089](https://arxiv.org/abs/2410.02089). Source of the public/private check split.
 - Zhou et al., *Language Agent Tree Search (LATS)* — [arXiv:2310.04406](https://arxiv.org/abs/2310.04406)
-- Wang et al., *Mixture-of-Agents* — layered fusion across model families — [arXiv:2406.04692](https://arxiv.org/abs/2406.04692)
+- Wang et al., *Mixture-of-Agents*, layered fusion across model families. [arXiv:2406.04692](https://arxiv.org/abs/2406.04692)
 - Madaan et al., *Self-Refine: Iterative Refinement with Self-Feedback* — [arXiv:2303.17651](https://arxiv.org/abs/2303.17651). Read the negative results too.
 
 **Self-improvement and training**
@@ -91,9 +93,20 @@ Grouped by the lesson that leans on them.
 ## Tier 3 — Practitioner references
 
 - Anthropic, [*Building Effective Agents*](https://www.anthropic.com/engineering/building-effective-agents) — the workflow taxonomy (chaining, routing, parallelisation, orchestrator–worker, evaluator–optimiser) that Lecture 1 uses directly.
-- Anthropic engineering blog, [effective context engineering / agent tooling posts](https://www.anthropic.com/engineering) — closest thing to a practitioner manual for the context-management material in Lesson 12.
+- Anthropic engineering blog, [context engineering and agent tooling posts](https://www.anthropic.com/engineering). The closest thing to a practitioner manual for the context-management material in Lesson 13.
 - OpenAI, [*A Practical Guide to Building Agents*](https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf)
 - [BIG-bench / HELM](https://crfm.stanford.edu/helm/) for how serious eval harnesses are structured.
+
+---
+
+## Tier 4 — Running your own experiment
+
+For Arc V. These are read for their method rather than their findings.
+
+- Brown et al., *Large Language Monkeys* — [arXiv:2407.21787](https://arxiv.org/abs/2407.21787). Reread for design rather than result. It separates coverage from selection carefully, which is the paired-comparison discipline in practice.
+- Snell et al., *Scaling LLM Test-Time Compute* — [arXiv:2408.03314](https://arxiv.org/abs/2408.03314). A model of matched-budget comparison, where the difficulty binning is what makes the claims survive scrutiny.
+- Kwa et al., *Measuring AI Ability to Complete Long Tasks* (METR) — [arXiv:2503.14499](https://arxiv.org/abs/2503.14499). Read the limitations section as a model of how to state the scope of a finding.
+- [The CS329A course site](https://cs329a.stanford.edu/) publishes previous years' student projects, which are the closest available worked examples at this scale.
 
 ---
 
@@ -105,4 +118,4 @@ Wisdom, not knowledge — for testing ideas against people who ship agents.
 - **[Latent Space](https://www.latent.space/)** (podcast + Discord) — practitioner-oriented, engineering-first, good for agent architecture debates.
 - **[EleutherAI Discord](https://discord.gg/eleutherai)** — research-adjacent but welcoming; the `#interpretability` and eval channels are unusually high signal.
 - **AI Engineer conference talks** ([YouTube](https://www.youtube.com/@aiDotEngineer)) — the closest thing to a practitioner conference for this exact job.
-- Local: any Bay-Area-style **AI evals meetup** or a workplace reading group — the eval material in Lessons 09–12 gets much better when argued about with people who have your data.
+- Local: any **AI evals meetup** or a workplace reading group. The eval material in Lessons 12 to 14 gets much better when argued about with people who have their own data, and an Arc V writeup is a good thing to bring.
