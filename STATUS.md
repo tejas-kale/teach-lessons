@@ -8,8 +8,8 @@ _Last updated: 2026-08-23_
 
 | Course | Lessons | Read | Progress |
 |---|---|---|---|
-| [FX & Central Banks](fx-and-central-banks/) | 4 | 2 | ▓▓▓▓▓░░░░░ 50% — in progress |
-| [Self-Improving AI Agents](self-improving-ai-agents/) | 17 | 0 | ░░░░░░░░░░ 0% — not started, reworked 23 Aug |
+| [FX & Central Banks](completed/fx-and-central-banks/) | 4 | 2 | ▓▓▓▓▓░░░░░ 50% — in progress |
+| [Self-Improving AI Agents](archived/self-improving-ai-agents/) | 17 | 0 | ░░░░░░░░░░ 0% — not started, reworked 23 Aug |
 
 ## Foreign Exchange & Central Banks
 
@@ -17,16 +17,16 @@ Built 20 August 2026, four lessons, ≈30 minutes end to end. Spine: *The Econom
 
 | # | Lesson | Status |
 |---|---|---|
-| 1 | [The exchange rate is a price](fx-and-central-banks/lessons/0001-the-exchange-rate-is-a-price.html) | ✅ Read |
-| 2 | [Reserves, and what it means to intervene](fx-and-central-banks/lessons/0002-reserves-and-intervention.html) | ✅ Read — Tejas stopped here; two lessons were sufficient for the session |
-| 3 | [Bonds, and the state as one balance sheet](fx-and-central-banks/lessons/0003-bonds-and-the-consolidated-state.html) | ⬜ Not read |
-| 4 | [The carry trade, and why buying yen unwinds it](fx-and-central-banks/lessons/0004-the-carry-trade-decoded.html) | ⬜ Not read |
+| 1 | [The exchange rate is a price](completed/fx-and-central-banks/lessons/0001-the-exchange-rate-is-a-price.html) | ✅ Read |
+| 2 | [Reserves, and what it means to intervene](completed/fx-and-central-banks/lessons/0002-reserves-and-intervention.html) | ✅ Read — Tejas stopped here; two lessons were sufficient for the session |
+| 3 | [Bonds, and the state as one balance sheet](completed/fx-and-central-banks/lessons/0003-bonds-and-the-consolidated-state.html) | ⬜ Not read |
+| 4 | [The carry trade, and why buying yen unwinds it](completed/fx-and-central-banks/lessons/0004-the-carry-trade-decoded.html) | ⬜ Not read |
 
 **Where to pick up:** Lesson 3, *consolidation* — netting the treasury and the central bank into one balance sheet. It is the load-bearing idea of the arc and Lesson 4 depends on it heavily, so resuming means starting there rather than skimming forward.
 
 **Retention:** unmeasured. Quiz and retrieval answers are not visible to the teacher. Before continuing, ask for the Lesson 2 mechanism cold — who actually spends the money in an intervention, and why the asymmetry runs the way it does.
 
-**Learning records:** [0001 — prior knowledge and time budget](fx-and-central-banks/learning-records/0001-prior-knowledge-and-time-budget.md), [0002 — arc one delivered](fx-and-central-banks/learning-records/0002-arc-one-delivered.md)
+**Learning records:** [0001 — prior knowledge and time budget](completed/fx-and-central-banks/learning-records/0001-prior-knowledge-and-time-budget.md), [0002 — arc one delivered](completed/fx-and-central-banks/learning-records/0002-arc-one-delivered.md)
 
 ## Self-Improving AI Agents
 
@@ -44,4 +44,4 @@ Built 21 August 2026 from Stanford CS329A transcripts. Reworked 23 August 2026: 
 
 **The project:** Arc V expects one experiment on your own workflows, at two to four weeks part-time. It does not need to wait until Lesson 15 — the hooks accumulate from Lesson 1, and the one you keep returning to is the one to run.
 
-**Learning records:** [0001 — practitioner, not researcher](self-improving-ai-agents/learning-records/0001-practitioner-not-researcher.md) (amended) · [0002 — course built from transcripts](self-improving-ai-agents/learning-records/0002-course-built-from-transcripts.md) · [0003 — the three bottlenecks](self-improving-ai-agents/learning-records/0003-the-three-bottlenecks.md) · [0004 — Part 04 correction](self-improving-ai-agents/learning-records/0004-part-04-correction.md) · [0005 — mission widened to include a project](self-improving-ai-agents/learning-records/0005-mission-widened-to-include-a-project.md)
+**Learning records:** [0001 — practitioner, not researcher](archived/self-improving-ai-agents/learning-records/0001-practitioner-not-researcher.md) (amended) · [0002 — course built from transcripts](archived/self-improving-ai-agents/learning-records/0002-course-built-from-transcripts.md) · [0003 — the three bottlenecks](archived/self-improving-ai-agents/learning-records/0003-the-three-bottlenecks.md) · [0004 — Part 04 correction](archived/self-improving-ai-agents/learning-records/0004-part-04-correction.md) · [0005 — mission widened to include a project](archived/self-improving-ai-agents/learning-records/0005-mission-widened-to-include-a-project.md)
