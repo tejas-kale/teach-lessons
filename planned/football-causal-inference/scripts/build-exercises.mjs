@@ -17,16 +17,15 @@ function render(sheet, index) {
   const lesson = lessonFiles[sheet.n - 1];
   const prev = index > 0 ? sheets[index - 1] : null;
   const next = index < sheets.length - 1 ? sheets[index + 1] : null;
-  const questions = sheet.questions.map((q, i) => `  <section class="question">
-    <span class="marks">Question ${i + 1}</span>
-    <h3>${q.title}</h3>
+  const questions = sheet.questions.map((q, i) => `  <details class="question">
+    <summary><span class="marks">Question ${i + 1}</span><span class="q-title">${q.title}</span></summary>
 ${q.body}
-  </section>`).join('\n\n');
-  const answers = sheet.questions.map((q, i) => `    <section class="question">
-      <span class="marks">Answer ${i + 1}</span>
-      <h3>${q.title}</h3>
+  </details>`).join('\n\n');
+  const answers = sheet.questions.map((q, i) => `      <section class="answer">
+        <span class="marks">Answer ${i + 1}</span>
+        <h3>${q.title}</h3>
 ${q.answer}
-    </section>`).join('\n\n');
+      </section>`).join('\n\n');
   return `<!doctype html>
 <html lang="en-GB">
 <head>
@@ -47,6 +46,7 @@ ${q.answer}
     <h2>How to use this sheet</h2>
     <p>Work through the questions in order and write your answers down before reading any part of the answer section. Give yourself about thirty minutes in total. If one question runs long, write what you have, mark it and move on, because the answer section explains the reasoning in full.</p>
     <p>Most questions ask for a short written answer rather than a number. The aim is a defensible statement, so a sentence or two of reasoning is worth more than a single word.</p>
+    <p>The questions are collapsed so that you can take them one at a time. Open one, answer it, then open the next. The answers are held behind a single button at the foot of the page, so nothing is revealed until you choose to reveal it.</p>
   </section>
 
 ${questions}
@@ -55,7 +55,10 @@ ${questions}
     <h2>Answers</h2>
     <p class="answer-note">Read these only after writing your own answers. Where an answer says "a good answer includes", treat the listed points as the marking scheme rather than as the only wording that works.</p>
 
+    <details class="answer-reveal">
+      <summary>Show all answers</summary>
 ${answers}
+    </details>
   </section>
 
   <p class="citation"><strong>Related reading.</strong> ${sheet.related}</p>
