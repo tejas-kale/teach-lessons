@@ -129,6 +129,7 @@ h1 {
 }
 
 .course footer a { color: var(--text); font-weight: 600; }
+.course-links { display: flex; gap: 20px; }
 
 .site-footer {
   min-height: 88px;
@@ -143,6 +144,7 @@ h1 {
   .course { grid-template-columns: 1fr; gap: 18px; }
   .course-heading { flex-direction: row; }
   .course footer { grid-column: 1; gap: 20px; }
+  .course-links { flex-wrap: wrap; gap: 12px 20px; }
 }
 
 @media (prefers-color-scheme: dark) {

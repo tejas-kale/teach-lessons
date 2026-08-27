@@ -26,7 +26,29 @@ for (const name of lessons) {
   }
 }
 
-for (const name of ['MISSION.md', 'NOTES.md', 'RESOURCES.md', 'README.md', 'index.html', 'assets/course.css', 'assets/quiz.js', 'assets/dag.svg', 'reference/glossary.html', 'reference/design-field-guide.html']) {
+const exercisesDir = join(root, 'exercises');
+const sheetFiles = readdirSync(exercisesDir).filter((name) => /^\d{4}-.*\.html$/.test(name)).sort();
+if (sheetFiles.length !== 17) errors.push(`Expected 17 exercise sheets, found ${sheetFiles.length}`);
+sheetFiles.forEach((name, index) => {
+  const file = join(exercisesDir, name);
+  const html = readFileSync(file, 'utf8');
+  for (const required of ['lang="en-GB"', '../assets/course.css', 'Related reading.', 'ask your teaching agent']) {
+    if (!html.includes(required)) errors.push(`${name}: missing ${required}`);
+  }
+  const questions = [...html.matchAll(/<span class="marks">Question \d+<\/span>/g)].length;
+  const answers = [...html.matchAll(/<span class="marks">Answer \d+<\/span>/g)].length;
+  if (questions < 5 || questions > 10) errors.push(`${name}: expected 5 to 10 questions, found ${questions}`);
+  if (questions !== answers) errors.push(`${name}: ${questions} questions but ${answers} answers`);
+  if (name.slice(0, 4) !== lessons[index].slice(0, 4)) errors.push(`${name}: does not pair with ${lessons[index]}`);
+  const lessonHtml = readFileSync(join(lessonsDir, lessons[index]), 'utf8');
+  if (!lessonHtml.includes(`../exercises/${name}`)) errors.push(`${lessons[index]}: does not link to its exercise sheet`);
+  for (const [, href] of html.matchAll(/href="([^"]+)"/g)) {
+    if (/^(https?:|#)/.test(href)) continue;
+    if (!existsSync(resolve(dirname(file), href))) errors.push(`${name}: broken local link ${href}`);
+  }
+});
+
+for (const name of ['MISSION.md', 'NOTES.md', 'RESOURCES.md', 'README.md', 'index.html', 'assets/course.css', 'assets/quiz.js', 'assets/dag.svg', 'reference/glossary.html', 'reference/design-field-guide.html', 'exercises/index.html', 'scripts/build-exercises.mjs']) {
   if (!existsSync(join(root, name))) errors.push(`Missing ${name}`);
 }
 
@@ -50,4 +72,4 @@ if (errors.length) {
   console.error(errors.join('\n'));
   process.exit(1);
 }
-console.log(`Verified ${lessons.length} lessons, index links, minimum lesson length, equal-word quiz options, local links, shared assets and evidence-gap labels.`);
+console.log(`Verified ${lessons.length} lessons, ${sheetFiles.length} exercise sheets, index links, minimum lesson length, equal-word quiz options, local links, shared assets and evidence-gap labels.`);

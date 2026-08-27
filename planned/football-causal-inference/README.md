@@ -6,8 +6,9 @@ A 17-lesson path from causal questions to advanced longitudinal methods, using f
 
 1. State each answer before revealing quiz feedback.
 2. Rewrite every worked example for a football question you care about.
-3. Do not choose an estimator until you can name the estimand and identification assumptions.
-4. Ask your teaching agent follow-up questions whenever a step is unclear.
+3. Work the matching [exercise sheet](exercises/index.html) after each lesson. Each sheet is seven or eight questions, about thirty minutes, with the answers held to the end so you can mark yourself.
+4. Do not choose an estimator until you can name the estimand and identification assumptions.
+5. Ask your teaching agent follow-up questions whenever a step is unclear.
 
 ## Lesson, technique and source crosswalk
 
