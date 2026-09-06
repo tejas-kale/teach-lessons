@@ -8,7 +8,7 @@ _Last updated: 2026-09-06_
 
 | Course | Lessons | Read | Progress |
 |---|---|---|---|
-| [Buying a used bicycle in Berlin](planned/used-bicycle-buying-berlin/) | 1 | 0 | ░░░░░░░░░░ 0% — not started |
+| [Buying a used bicycle in Berlin](completed/used-bicycle-buying-berlin/) | 1 | 1 | ▓▓▓▓▓▓▓▓▓▓ 100% — completed |
 | [iPhone Air Autumn Photography](planned/iphone-air-autumn-photography/) | 6 | 0 | ░░░░░░░░░░ 0% — not started |
 | [FX & Central Banks](completed/fx-and-central-banks/) | 4 | 2 | ▓▓▓▓▓░░░░░ 50% — in progress |
 | [Self-Improving AI Agents](archived/self-improving-ai-agents/) | 17 | 0 | ░░░░░░░░░░ 0% — not started, reworked 23 Aug |
