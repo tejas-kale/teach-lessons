@@ -2,15 +2,33 @@
 
 Progress across the teaching workspaces in this repository. Update this file whenever a lesson is read, a learning record is written, or a new arc starts.
 
-_Last updated: 2026-08-27_
+_Last updated: 2026-09-06_
 
 ## Summary
 
 | Course | Lessons | Read | Progress |
 |---|---|---|---|
+| [iPhone Air Autumn Photography](planned/iphone-air-autumn-photography/) | 6 | 0 | ░░░░░░░░░░ 0% — not started |
 | [FX & Central Banks](completed/fx-and-central-banks/) | 4 | 2 | ▓▓▓▓▓░░░░░ 50% — in progress |
 | [Self-Improving AI Agents](archived/self-improving-ai-agents/) | 17 | 0 | ░░░░░░░░░░ 0% — not started, reworked 23 Aug |
 | [Football Causal Inference](planned/football-causal-inference/) | 17 | 1 | ▓░░░░░░░░░ 6% — in progress |
+
+## iPhone Air Autumn Photography
+
+Built 6 September 2026 from [blog issue #12](https://github.com/tejas-kale/blog/issues/12) and the research/syllabus in [PR #13](https://github.com/tejas-kale/blog/pull/13). Six lessons, unread. Catalogue tag: **Planned** — not completed.
+
+| # | Lesson | Status |
+|---|---|---|
+| 1 | [The camera you actually have](planned/iphone-air-autumn-photography/lessons/0001-the-camera-you-actually-have.html) | ⬜ Not read |
+| 2 | [Configure the Air once](planned/iphone-air-autumn-photography/lessons/0002-configure-the-air-once.html) | ⬜ Not read |
+| 3 | [Protect the yellow](planned/iphone-air-autumn-photography/lessons/0003-protect-the-yellow.html) | ⬜ Not read |
+| 4 | [Compose without an ultra-wide](planned/iphone-air-autumn-photography/lessons/0004-compose-without-an-ultra-wide.html) | ⬜ Not read |
+| 5 | [Two scales without macro](planned/iphone-air-autumn-photography/lessons/0005-two-scales-without-macro.html) | ⬜ Not read |
+| 6 | [Cull, two-minute edit, publish](planned/iphone-air-autumn-photography/lessons/0006-cull-edit-publish.html) | ⬜ Not read |
+
+**Where to start:** Lesson 1, then tonight’s four frames of one control tree. Do not skip to composition while the camera map is still Pro folklore.
+
+**Learning records:** [0001 — prior constraints and hardware](planned/iphone-air-autumn-photography/learning-records/0001-prior-constraints-and-hardware.md)
 
 ## Football Causal Inference
 
