@@ -2,17 +2,34 @@
 
 Progress across the teaching workspaces in this repository. Update this file whenever a lesson is read, a learning record is written, or a new arc starts.
 
-_Last updated: 2026-09-06_
+_Last updated: 2026-09-08_
 
 ## Summary
 
 | Course | Lessons | Read | Progress |
 |---|---|---|---|
 | [Buying a used bicycle in Berlin](completed/used-bicycle-buying-berlin/) | 1 | 1 | ▓▓▓▓▓▓▓▓▓▓ 100% — completed |
+| [ICE-ing the Economy](planned/ice-ing-the-economy/) | 5 | 0 | ░░░░░░░░░░ 0% — not started |
 | [iPhone Air Autumn Photography](planned/iphone-air-autumn-photography/) | 6 | 0 | ░░░░░░░░░░ 0% — not started |
 | [FX & Central Banks](completed/fx-and-central-banks/) | 4 | 2 | ▓▓▓▓▓░░░░░ 50% — in progress |
 | [Self-Improving AI Agents](archived/self-improving-ai-agents/) | 17 | 0 | ░░░░░░░░░░ 0% — not started, reworked 23 Aug |
 | [Football Causal Inference](planned/football-causal-inference/) | 17 | 1 | ▓░░░░░░░░░ 6% — in progress |
+
+## ICE-ing the Economy
+
+Built 8 September 2026 from Hernandez (2026), *ICE-ing the Economy* (SSRN 6759278). Five lessons for a data scientist. Catalogue tag: **Planned** — not completed.
+
+| # | Lesson | Status |
+|---|---|---|
+| 1 | [The demand side was missing](planned/ice-ing-the-economy/lessons/0001-the-demand-side-was-missing.html) | ⬜ Not read |
+| 2 | [What was actually measured](planned/ice-ing-the-economy/lessons/0002-what-was-actually-measured.html) | ⬜ Not read |
+| 3 | [Two designs, not one robustness table](planned/ice-ing-the-economy/lessons/0003-two-designs.html) | ⬜ Not read |
+| 4 | [What the estimates say](planned/ice-ing-the-economy/lessons/0004-what-the-estimates-say.html) | ⬜ Not read |
+| 5 | [What a reviewer still owns](planned/ice-ing-the-economy/lessons/0005-what-a-reviewer-still-owns.html) | ⬜ Not read |
+
+**Where to start:** Lesson 1, then do not skip Lesson 3. The billions in Lesson 4 are uninterpretable without the measurement and design lessons.
+
+**Learning records:** [0001 — prior knowledge: data scientist](planned/ice-ing-the-economy/learning-records/0001-prior-knowledge-data-scientist.md)
 
 ## iPhone Air Autumn Photography
 
